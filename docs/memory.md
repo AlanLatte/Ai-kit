@@ -96,8 +96,18 @@ restoration, user runtime preservation, worktree precedence, shutdown and safe
 configuration errors. It requires Node.js 22+ and Git and uses no service or
 credentials. It does not prove native backend initialization or live recall.
 
-Live profile cutover is explicitly unverified: registration of the entrypoint,
-removal of an older local router, real native settings/backend transitions and
-recall against the existing banks must be checked by the owner-controlled
-integration workflow. No running profile, local routing file, service, global
-settings or memory data is changed by preparing this package.
+Native OMP 18.18.6 integration has also been checked in fresh processes using
+the installed package: optional router registration, ordinary directories,
+nested checkouts, symlink aliases, external linked worktrees with their own
+project installation, and native bank selection outside explicit routes.
+Automatic recall and mental-model injection retained the same measured sizes
+when replacing the previous router against existing banks. A loopback-only
+provider observed the final request without calling a language model;
+auto-retention and mental-model auto-seeding were disabled for those probes.
+No memory contents or real routes are published here.
+
+With an unavailable service, routing stayed on the selected bank and no memory
+from another bank was injected. The read-only readiness command reported the
+service error explicitly. Live user settings retain their original backend
+and recall limits. Already-running OMP sessions must restart to load a changed
+extension list; package installation does not hot-replace their modules.
