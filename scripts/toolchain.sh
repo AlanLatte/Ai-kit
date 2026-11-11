@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 set -uo pipefail
 
-mode=${1:-check}
+mode=${1:-report}
+[ "$#" -eq 0 ] || shift
+selected=("$@")
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 hindsight_script="$script_dir/hindsight.mjs"
 printf -v hindsight_install 'node %q install' "$hindsight_script"
@@ -17,8 +19,46 @@ TOOLS=(
   "jq|JSON inspection|brew install jq"
   "shellcheck|shell script diagnostics|brew install shellcheck"
   "tre|directory inspection|brew install tre-command"
-  "hindsight|долговременная память: API и подключение клиента|$hindsight_install"
+  "hindsight|Hindsight API and native client readiness|$hindsight_install"
 )
+
+usage() {
+  printf 'Usage: toolchain.sh check|report [COMPONENT ...] | install COMPONENT ...\n' >&2
+  printf 'Components: git python3 uv docker pre-commit node ripwire jq shellcheck tre hindsight\n' >&2
+}
+
+case "$mode" in
+  check|report) ;;
+  install)
+    if [ "${#selected[@]}" -eq 0 ]; then
+      printf 'Select components first; installation without a selection is forbidden.\n' >&2
+      usage
+      exit 2
+    fi
+    ;;
+  *) usage; exit 2 ;;
+esac
+
+for requested in ${selected[@]+"${selected[@]}"}; do
+  found=0
+  for row in "${TOOLS[@]}"; do
+    IFS='|' read -r name _ _ <<<"$row"
+    if [[ "$requested" == "$name" ]]; then found=1; break; fi
+  done
+  if [ "$found" -eq 0 ]; then
+    printf 'Unknown component: %s\n' "$requested" >&2
+    usage
+    exit 2
+  fi
+done
+
+is_selected() {
+  [ "${#selected[@]}" -ne 0 ] || return 0
+  for requested in "${selected[@]}"; do
+    [[ "$requested" != "$1" ]] || return 0
+  done
+  return 1
+}
 
 collect_readiness() {
   missing=()
@@ -26,9 +66,10 @@ collect_readiness() {
   hindsight_error=
   for row in "${TOOLS[@]}"; do
     IFS='|' read -r name why how <<<"$row"
+    is_selected "$name" || continue
     if [[ "$name" == hindsight ]]; then
       if ! command -v node >/dev/null 2>&1; then
-        hindsight_error='Hindsight: требуется node для проверки API и подключения клиента.'
+        hindsight_error='Hindsight: Node is required to check the API and client configuration.'
       elif hindsight_error="$(node "$hindsight_script" check 2>&1)"; then
         present+=("$name")
         continue
@@ -52,54 +93,38 @@ print_missing() {
 }
 
 print_report() {
-  printf 'Есть (%d): %s\n' "${#present[@]}" "${present[*]-}"
-  if [ ${#missing[@]} -eq 0 ]; then
-    printf 'Отсутствует: ничего\n'
+  printf 'Available (%d): %s\n' "${#present[@]}" "${present[*]-}"
+  if [ "${#missing[@]}" -eq 0 ]; then
+    printf 'Missing: none\n'
   else
-    printf 'Отсутствует (%d):\n' "${#missing[@]}"
+    printf 'Missing (%d):\n' "${#missing[@]}"
     print_missing
   fi
 }
 
 collect_readiness
-
 case "$mode" in
   check)
-    [ ${#missing[@]} -eq 0 ] && exit 0
-    printf 'Инструментарий неполон, отсутствует %d из %d:\n' "${#missing[@]}" "${#TOOLS[@]}" >&2
+    [ "${#missing[@]}" -eq 0 ] && exit 0
+    printf 'Selected tooling is not ready (%d missing):\n' "${#missing[@]}" >&2
     print_missing >&2
-    skill_command=/toolchain
-    [[ "${AI_KIT_CLIENT:-}" == omp ]] && skill_command=/skill:toolchain
-    printf 'Поставить всё разом: скил %s, либо этот скрипт с install.\n' "$skill_command" >&2
-    exit 0
+    printf 'Use the toolchain skill selector; only selected components may be installed.\n' >&2
     ;;
-  report)
-    print_report
-    ;;
+  report) print_report ;;
   install)
     failed=0
     for row in ${missing[@]+"${missing[@]}"}; do
       IFS='|' read -r name why how <<<"$row"
-      [[ "$name" == hindsight ]] && continue
-      printf '\n==> %s (%s)\n    %s\n' "$name" "$why" "$how"
-      if ! eval "$how"; then
-        printf '    НЕ УСТАНОВЛЕН: %s\n' "$name" >&2
+      printf '\n==> %s (%s)\n' "$name" "$why"
+      if [[ "$name" == hindsight ]]; then
+        if ! node "$hindsight_script" install; then failed=1; fi
+      elif ! eval "$how"; then
         failed=1
       fi
     done
-    printf '\n==> hindsight\n    %s\n' "$hindsight_install"
-    if ! node "$hindsight_script" install; then
-      printf '    НЕ НАСТРОЕН: hindsight\n' >&2
-      failed=1
-    fi
-    printf '\nПовторная проверка:\n'
     collect_readiness
     print_report
-    [ ${#missing[@]} -eq 0 ] || failed=1
+    [ "${#missing[@]}" -eq 0 ] || failed=1
     exit "$failed"
-    ;;
-  *)
-    printf 'Режимы: check, report, install\n' >&2
-    exit 1
     ;;
 esac

@@ -13,11 +13,10 @@ function fixture(t, { ready = false, missing = [], installReady = false, install
   mkdirSync(scripts, { recursive: true });
   mkdirSync(bin);
   const script = join(scripts, "toolchain.sh");
-  const helper = join(scripts, "hindsight.mjs");
   const calls = join(directory, "calls");
   const state = join(directory, "ready");
   copyFileSync(new URL("../scripts/toolchain.sh", import.meta.url), script);
-  writeFileSync(helper, "");
+  writeFileSync(join(scripts, "hindsight.mjs"), "");
   writeFileSync(calls, "");
   if (ready) writeFileSync(state, "ready");
   symlinkSync("/usr/bin/dirname", join(bin, "dirname"));
@@ -26,13 +25,9 @@ function fixture(t, { ready = false, missing = [], installReady = false, install
   }
   writeFileSync(join(bin, "brew"), '#!/bin/bash\nprintf "brew %s\\n" "$*" >> "$CALLS"\nexit "$BREW_STATUS"\n', { mode: 0o755 });
   writeFileSync(join(bin, "node"), `#!/bin/bash
-printf '%s\\t%s\\n' "$1" "$2" >> "$CALLS"
+printf 'hindsight %s\\n' "$2" >> "$CALLS"
 case "$2" in
-  check)
-    [ -f "$STATE" ] && exit 0
-    printf 'Hindsight: API unavailable; start Docker explicitly.\\n' >&2
-    exit 1
-    ;;
+  check) [ -f "$STATE" ] ;;
   install)
     if [ "$INSTALL_READY" = 1 ]; then printf ready > "$STATE"; fi
     exit "$INSTALL_STATUS"
@@ -43,7 +38,7 @@ esac
   return {
     state,
     calls: () => readFileSync(calls, "utf8").trim().split("\n").filter(Boolean),
-    run: (mode) => spawnSync("/bin/bash", [script, mode], {
+    run: (...args) => spawnSync("/bin/bash", [script, ...args], {
       cwd: directory,
       encoding: "utf8",
       env: { PATH: bin, HOME: directory, AI_KIT_CLIENT: "omp", CALLS: calls, STATE: state, INSTALL_READY: installReady ? "1" : "0", INSTALL_STATUS: installStatus, BREW_STATUS: brewStatus },
@@ -51,57 +46,67 @@ esac
   };
 }
 
-test("startup check and report expose service failure without installation or state changes", (t) => {
+test("diagnostics never install binaries or create service state", (t) => {
   const context = fixture(t);
-  const check = context.run("check");
-  assert.equal(check.status, 0);
-  assert.equal(check.stdout, "");
-  assert.match(check.stderr, /Hindsight: API unavailable/);
-  const report = context.run("report");
-  assert.equal(report.status, 0);
-  assert.match(report.stdout, /hindsight/);
-  assert.match(report.stdout, /Hindsight: API unavailable/);
-  assert.ok(context.calls().every((call) => !call.includes("install")));
+  assert.equal(context.run("check").status, 0);
+  assert.equal(context.run("report").status, 0);
+  assert.ok(context.calls().every((call) => call === "hindsight check"));
   assert.equal(existsSync(context.state), false);
 });
 
-test("ready startup stays quiet and explicit installation works from a spaced package path", (t) => {
-  const context = fixture(t, { ready: true, installReady: true });
-  const check = context.run("check");
-  assert.equal(check.status, 0);
-  assert.equal(check.stdout + check.stderr, "");
-  rmSync(context.state);
-  const install = context.run("install");
-  assert.equal(install.status, 0);
-  assert.equal(existsSync(context.state), true);
+test("empty, unknown and mixed-invalid selections reject before any installer or service probe", (t) => {
+  for (const selection of [[], ["unknown"], ["jq", "unknown"], ["jq; false"]]) {
+    const context = fixture(t, { missing: ["jq"] });
+    assert.equal(context.run("install", ...selection).status, 2);
+    assert.deepEqual(context.calls(), []);
+    assert.equal(existsSync(context.state), false);
+  }
 });
 
-test("successful install command cannot hide an unavailable runtime", (t) => {
-  const context = fixture(t);
-  const result = context.run("install");
-  assert.equal(result.status, 1);
-  assert.match(result.stdout, /Hindsight: API unavailable/);
-});
-
-test("remaining missing binaries make installation fail even when Hindsight becomes ready", (t) => {
+test("a binary-only selection does not inspect or configure Hindsight", (t) => {
   const context = fixture(t, { missing: ["jq"], installReady: true });
-  const result = context.run("install");
+  const result = context.run("install", "jq");
   assert.equal(result.status, 1);
-  assert.match(result.stdout, /jq/);
+  assert.deepEqual(context.calls(), ["brew install jq"]);
+  assert.equal(existsSync(context.state), false);
+});
+
+test("selected report does not inspect unselected service configuration", (t) => {
+  const context = fixture(t);
+  assert.equal(context.run("report", "jq").status, 0);
+  assert.deepEqual(context.calls(), []);
+});
+
+test("unselected missing tools do not fail a successful selected service setup", (t) => {
+  const context = fixture(t, { missing: ["jq"], installReady: true });
+  assert.equal(context.run("install", "hindsight").status, 0);
+  assert.equal(existsSync(context.state), true);
+  assert.ok(context.calls().every((call) => call.startsWith("hindsight ")));
+});
+
+test("healthy selected installations are reused without another install", (t) => {
+  const context = fixture(t, { ready: true });
+  assert.equal(context.run("install", "hindsight", "jq").status, 0);
+  assert.ok(context.calls().every((call) => call === "hindsight check"));
   assert.equal(existsSync(context.state), true);
 });
 
-test("helper installation failure is nonzero even when the final API check succeeds", (t) => {
-  const context = fixture(t, { ready: true, installStatus: "7" });
-  const result = context.run("install");
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /hindsight/);
+test("installer success cannot hide selected service unavailability", (t) => {
+  const context = fixture(t);
+  assert.equal(context.run("install", "hindsight").status, 1);
+  assert.equal(existsSync(context.state), false);
 });
 
-test("binary installation failure remains nonzero and does not skip Hindsight", (t) => {
-  const context = fixture(t, { missing: ["jq"], ready: true, brewStatus: "3" });
-  const result = context.run("install");
-  assert.equal(result.status, 1);
-  assert.match(result.stderr, /jq/);
-  assert.match(result.stdout, /==> hindsight/);
+test("installer failure remains nonzero even if selected service becomes ready", (t) => {
+  const context = fixture(t, { installReady: true, installStatus: "7" });
+  assert.equal(context.run("install", "hindsight").status, 1);
+  assert.equal(existsSync(context.state), true);
+});
+
+test("independent selected components continue after another installation fails", (t) => {
+  const context = fixture(t, { missing: ["jq"], installReady: true, brewStatus: "3" });
+  assert.equal(context.run("install", "jq", "hindsight", "hindsight").status, 1);
+  assert.equal(existsSync(context.state), true);
+  assert.equal(context.calls().filter((call) => call === "hindsight install").length, 1);
+  assert.equal(context.calls().filter((call) => call === "brew install jq").length, 1);
 });
