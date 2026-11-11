@@ -1,0 +1,13 @@
+{
+  "name": "ai-kit",
+  "version": "0.1.0",
+  "description": "Personal skills without project policies",
+  "author": {
+    "name": "AlanLatte"
+  },
+  "license": "UNLICENSED",
+  "skills": [
+    "./skills",
+    "./vendor/ponytail/skills"
+  ]
+}

@@ -1,0 +1,29 @@
+name: hindsight
+services:
+  hindsight:
+    image: ghcr.io/vectorize-io/hindsight@sha256:d1840062a5b79940ab7a9f4809ceb90fc776d4ad737cd9329e9b5836cc64ab70
+    container_name: hindsight
+    restart: unless-stopped
+    shm_size: 1gb
+    ports:
+      - "127.0.0.1:8888:8888"
+      - "127.0.0.1:9999:9999"
+    env_file:
+      - llm.env
+    environment:
+      HINDSIGHT_API_WORKER_ID: hindsight-local
+    volumes:
+      - hindsight-data:/home/hindsight/.pg0
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import json,urllib.request; h=json.load(urllib.request.urlopen('http://127.0.0.1:8888/health', timeout=3)); assert h.get('status') == 'healthy' and h.get('database') == 'connected'"
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 30s
+volumes:
+  hindsight-data:
+    name: hindsight-data

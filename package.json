@@ -1,0 +1,20 @@
+{
+  "name": "ai-kit",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Personal native OMP tooling without project policies",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=22"
+  },
+  "omp": {
+    "extensions": [
+      "./omp/ponytail.mjs",
+      "./omp/memory.mjs"
+    ]
+  },
+  "scripts": {
+    "test": "node --test tests/*.test.mjs"
+  }
+}
