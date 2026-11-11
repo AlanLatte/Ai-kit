@@ -1,6 +1,6 @@
 # Backlog.md setup
 
-Separate the CLI, tracker initialization and MCP integration. The selector must disclose which of these will change. Installing Backlog.md does not authorize `backlog init`, adopting another workspace's task policy or pinning one private tracker globally.
+Separate the CLI, tracker initialization and MCP integration internally, not as three user questionnaires. Selecting Backlog in recommended/custom setup includes its MCP connector. Installing the environment does not authorize `backlog init`, adopting another workspace's task policy or pinning one private tracker globally.
 
 ## Install only when absent
 
@@ -17,7 +17,7 @@ The official npm alternative is `npm install --global backlog.md`, with an appro
 
 Read the common `backlog` skill. Resolve the owning tracker from the user's chosen workspace, existing configuration and linked-worktree relationship before operating. Inspect its config and project policy without exporting them into Ai-Kit.
 
-If a tracker exists, do not rerun init or overwrite labels, statuses, due dates, DoD, integration instructions or git/remote-operation flags. Verify with a read-only search/list from its root. If no tracker exists, ask whether the user actually wants one and at which exact root. On explicit approval read `backlog init --help` for the installed version. A non-invasive new tracker can use:
+If a tracker exists, do not rerun init or overwrite labels, statuses, due dates, DoD, integration instructions or git/remote-operation flags. Verify with a read-only search/list from its root. If machine setup has no owning project/tracker yet, install the CLI and generic connector without another initialization question; report that task operations need a project tracker and do not claim they are ready. Initialize only as part of an explicitly requested project/tracker setup at a known root, resolving a genuinely missing ownership decision if necessary. Read `backlog init --help` for the installed version. A non-invasive new tracker can use:
 
 ```sh
 backlog init "Approved tracker name" --defaults --integration-mode none --no-git
@@ -37,7 +37,7 @@ Without explicit cwd binding, this server follows client MCP roots. An initializ
 
 For a fixed, approved workspace tracker, pass `--cwd <absolute-tracker-root>` in the local connector's argument array or set its `BACKLOG_CWD`. Both pin the tracker and disable following client roots. Scope that connector to the intended client/project; do not pin one workspace tracker into a global connector used by unrelated workspaces. Preserve an existing generic following-roots connector if the selected target already works.
 
-Verify initialize/tools-list and read `backlog://workflow/overview` for the intended tracker. `backlog://init-required` means the connector started but no tracker is ready; it is not permission to initialize one. A successful `backlog --version` or MCP handshake does not prove task ownership. Do not create a real task as a setup health check or write into another tracker's MCP.
+Verify initialize/tools-list and, when an owning tracker exists, read its `backlog://workflow/overview`. `backlog://init-required` means the connector started but no tracker is ready; it is not permission to initialize one. In machine-only setup without a project, report CLI/connector readiness separately from unavailable task operations. For an existing tracker, init-required is a binding failure to repair, not a successful setup. A version or MCP handshake alone does not prove task ownership. Do not create a real task as a health check or write into another tracker's MCP.
 
 ## Sources
 

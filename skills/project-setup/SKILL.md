@@ -6,6 +6,8 @@ description: Create or connect a project workspace with ghq, scoped Git profiles
 
 Set up a workspace or repository only when requested. Adding or reading this skill does not authorize installation, account changes, key export, remote creation or publication. Keep project descriptions, actual hosts/accounts/paths, private keys and local configuration out of Ai-Kit.
 
+When called by `toolchain` for recommended environment setup, reuse its approved projects location and existing matching workspace profiles. Do not show another root/workspace/account or clone-versus-new questionnaire, create a repository, invent a new identity or rewrite every workspace under that root. Install missing Git/ghq/GCM prerequisites, preserve existing routing and verify matching identity/signing settings. Ask only for a genuinely missing identity/key, private authentication or an actual configuration conflict. The project-creation questions below apply only when a project was explicitly requested.
+
 ## 1. Discover before changing
 
 A development root contains workspaces; a workspace contains independent repository checkouts. Do not turn the workspace into a Git repository or scaffold an application without a separate requirement.

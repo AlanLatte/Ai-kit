@@ -1,6 +1,6 @@
 # Whiteboard setup
 
-Ask for Desktop versus headless only after Whiteboard is selected. Reuse an installed official CLI/app and its intended stable instance; do not select preview/dev, replace its state, or start a backend during inventory. A Desktop-managed CLI may work with its own runtime even if system Node is incompatible.
+Choose the mode yourself: reuse an installed official CLI/app and its intended stable instance; otherwise prefer Desktop on a supported graphical machine and headless on a server. Do not ask Desktop versus headless in the normal setup flow. Ask only when an existing-mode/storage conflict cannot be preserved. Do not select preview/dev, replace state, or start a backend during inventory. A Desktop-managed CLI may work with its own runtime even if system Node is incompatible.
 
 ## Desktop: install and operate without manual PATH setup
 
@@ -35,7 +35,7 @@ Do not replace a Desktop-managed shim or another default Node to make this comma
 
 When installing into a private prefix, run npm with the chosen runtime in that child process, for example `env PATH="$node_bin:$PATH" "$node_bin/npm" install --prefix "$tool_prefix" @dev.fast/whiteboard`. An absolute npm path alone does not override its env-node shebang. Invoke the resolved entry with `"$node_bin/node" "$cli_entry" ...`. Save only the non-secret resolved command/args/runtime/state-directory metadata under `${XDG_CONFIG_HOME:-$HOME/.config}/ai-kit/tools.json`, merging the selected component without replacing others, so future inventory can reuse it even when it is not on PATH. Never put credentials there.
 
-For a selected new headless server, ask for a private state directory. Reuse a working existing directory/server; never share a directory between independent servers or reuse Desktop storage for a second process. Through the resolved CLI invocation run:
+For a new headless server, reuse a compatible configured state directory or choose a private, dedicated `${XDG_STATE_HOME:-$HOME/.local/state}/ai-kit/whiteboard` directory. Do not ask another directory question unless the chosen location conflicts with existing state. Never share a directory between independent servers or reuse Desktop storage for a second process. Through the resolved CLI invocation run:
 
 ```text
 server start --state-dir <approved-state-directory> --detach --json
@@ -46,7 +46,7 @@ Startup is a disclosed configuration action, not a read-only probe. Stop on a st
 
 ## MCP and actual readiness
 
-Only add the connector if the user also selected it. The transport is stdio, with resolved CLI command plus `mcp` args. For headless add the approved state selection: `whiteboard --state-dir <directory> mcp`. `mcp` is an adapter and does not itself start the backend.
+Whiteboard selection includes its stdio MCP connector; do not ask a separate integration question. Reuse an existing matching connector and preserve unrelated definitions/auth. Use the resolved CLI command plus `mcp` args. For headless add the approved state selection: `whiteboard --state-dir <directory> mcp`. `mcp` is an adapter and does not itself start the backend.
 
 For a Desktop without a PATH shim, the connector command is its discovered executable, args are `[<bundled-cli-path>, "mcp"]`, env is `{"ELECTRON_RUN_AS_NODE":"1"}`. For managed standalone Node, use that Node executable with `[<resolved-cli-entry>, ...state-args, "mcp"]`. These paths belong only in local client configuration, never Ai-Kit. Follow [OMP/MCP setup](omp-mcp.md) to preserve existing servers and auth.
 

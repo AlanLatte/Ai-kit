@@ -1,10 +1,10 @@
 ---
 name: toolchain
-description: Select, install and configure OMP, Hindsight, Backlog.md, Whiteboard, MCP servers and common local tools; preserve existing profiles, data and credentials.
+description: "Configure OMP, memory, Backlog, Whiteboard and Git with two questions: projects location, then recommended automatic setup or an all-selected custom list."
 ---
 # Environment setup selector
 
-This is an agent-run setup flow, not an instruction sheet for the user to install everything. Start with discovery, present a native multi-select form, then execute the selected installation and configuration steps yourself. Do not mutate the machine before selection. Reading this skill or a startup diagnostic is not installation approval.
+This is an agent-run setup flow, not an instruction sheet. Ask where projects belong, then offer "Реши все за меня" as the default. Execute the approved setup yourself, including dependencies and integrations. Reading the skill or displaying defaults is not installation approval. Do not resume a previously cancelled setup merely because the user requests changes to Ai-Kit itself.
 
 For an explicit check/report-only request, stop after read-only inventory and findings. Do not turn diagnostics into an installation prompt or any mutation.
 
@@ -18,27 +18,52 @@ AI_KIT_CLIENT=omp bash ../../scripts/toolchain.sh report
 
 Also inspect `omp --version`, `backlog --version` and Whiteboard through its discovered CLI or Desktop bundled runtime. No external Bun is required by compiled OMP. Distinguish executable installed, configuration present, backend running and operational readiness. Inspect MCP names/scopes/transports without printing auth/header/env values. Do not start Docker, Whiteboard, a server, an installer or an auth flow during discovery.
 
-## 2. Present an actual selector
+## 2. Ask two questions, then act
 
-Use the client's native interactive multi-select/form, with no boxes selected by default. Show each component's detected state and proposed action: install if absent, configure the selected target, reuse if ready. An explicitly requested component can be preselected, but unrelated components never are. Empty selection or cancellation means no installation, services, config writes or tracker initialization. If the client has no interactive selection capability, stop before mutation rather than simulating consent.
+Use answers already supplied in the conversation instead of asking again. Explicitly requesting recommended setup is a mode answer, not a reason to show another selector. Cancellation before the flow is complete means no directory creation, installation, service startup, config writes or tracker initialization.
 
-Offer these separate choices; do not reduce the selector to the components already missing:
+### Question 1: where will projects live?
 
-| ID | Component | Execution after selection |
-|---|---|---|
-| omp | OMP CLI and chosen profile | [OMP/MCP setup](references/omp-mcp.md) |
-| hindsight | Native Hindsight memory | Existing helper and section4 below |
-| backlog | Backlog.md CLI and optional tracker setup | [Backlog setup](references/backlog.md) |
-| whiteboard | Whiteboard Desktop or headless | [Whiteboard setup](references/whiteboard.md) |
-| mcp | Selected MCP connectors | Second multi-select: Backlog, Whiteboard, custom; [OMP/MCP setup](references/omp-mcp.md) |
-| git-workspace | Workspace Git/ghq/GCM/signing | Existing `project-setup` skill; no profile/key changes just from selecting Git binary |
-| git, python3, uv, docker, pre-commit, node, ripwire, jq, shellcheck, tre | Individual common tools | Explicit helper IDs, or supported native OS installer |
+Show one editable path, prefilled with the detected development root. If several roots exist, prefer the most specific existing root containing the current workspace. If none is known, suggest `~/Developments`. Accept another path in that same question; do not ask the user to choose profiles, repositories or accounts here. Normalize it as a filesystem path, never a shell command. Create an approved missing directory only after the setup mode is answered. A development root is not a Git repository and does not authorize rewriting every workspace beneath it.
 
-After selection, ask only materially missing decisions for chosen components: profile/scope, existing versus local/remote service, Whiteboard mode, tracker/client root, custom MCP definition, or a conflict with existing configuration. Use another native form when needed, never request credentials in chat.
+### Question 2: how should the environment be configured?
 
-Before installing, show the exact selected set, necessary dependencies and intended config/service changes. Missing Homebrew or another package manager is an additional dependency requiring approval, not permission to bootstrap it silently. Examples: local Hindsight needs Node, OMP for native integration and running Docker/Compose; a healthy remote needs no Docker; standalone Whiteboard needs its supported Node24 runtime, whereas Desktop uses its bundled runtime; Backlog MCP needs Backlog and an OMP target. Display dependencies not initially selected and obtain consent before adding them. Do not install an optional integration merely because a binary is selected.
+Show only these two choices:
 
-Selection authorizes the disclosed actions; do not ask again for every ordinary command. Ask separately only for new dependency/scope changes, destructive conflicts, credentials or OS permissions. Installing a tool is not permission to delete its data, replace another backend, log in as another account or enable transcript uploads.
+- **Реши все за меня (рекомендуется)**, selected by default. Disclose that this installs missing recommended tools and their official package-manager/runtime dependencies, configures integrations and starts necessary local services while preserving existing settings, data and keys.
+- **Хочу выбрать сам**. Show one component list with every item selected by default; the user removes unwanted items. Do not follow it with another MCP, profile, service-mode or dependency questionnaire.
+
+The native mode form can use this shape:
+
+```html
+<form>
+<p>Агент установит недостающие инструменты и зависимости, подключит интеграции и запустит нужные локальные сервисы. Рабочие настройки, данные и ключи сохраняются.</p>
+<fieldset>
+<legend>Как настроить окружение?</legend>
+<label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP, память, Backlog, Whiteboard, Git/ghq/GCM, подписи и общие инструменты</label>
+<label><input type="radio" name="setup_mode" value="custom"> Хочу выбрать сам</label>
+</fieldset>
+</form>
+```
+
+In custom mode generate one native multi-select from the following table, with all entries checked/selected. Empty custom selection means no mutation, not fallback to the recommended set. If forms are unavailable, ask the same questions in text and wait for answers; do not simulate consent.
+
+| ID | Component and included setup |
+|---|---|
+| omp | OMP in the current profile; [OMP/MCP setup](references/omp-mcp.md) |
+| hindsight | Native Hindsight memory; existing helper and section4 below |
+| backlog | Backlog.md and its MCP connector; reuse an existing owning tracker, [Backlog setup](references/backlog.md) |
+| whiteboard | Whiteboard and its MCP connector; [Whiteboard setup](references/whiteboard.md) |
+| git-workspace | Git, ghq, GCM and existing-key signing; reuse `project-setup` |
+| python3, uv, docker, pre-commit, node, ripwire, jq, shellcheck, tre | One entry per common tool |
+
+Recommended mode selects every entry in this table. Git is included through `git-workspace`, not a duplicate checkbox. MCP is included with Backlog and Whiteboard, not a separate choice; Hindsight uses OMP's native backend. Custom servers are configured only when explicitly requested.
+
+Choose technical details yourself: retain the effective current OMP profile and its environment overrides; reuse healthy services and matching Git profiles; prefer an installed Whiteboard mode, otherwise Desktop on a supported graphical machine and headless on a server; use stdio for bundled MCP connectors and preserve appropriate existing client scopes. Keep generic user connectors generic and tracker-specific bindings project-local. Do not ask about these defaults merely because configuration has several possible shapes.
+
+Show a short action summary and execute without another approval round: mode/custom selection authorizes its disclosed tools, required official dependencies, integration setup and necessary service startup. Deduplicate shared dependencies. Do not upgrade healthy tools, install unrelated custom MCP packages or enable uploads/telemetry. Preserve unrelated package-manager, Git, model, auth and project settings.
+
+Ask only when execution genuinely needs private authentication, a missing author identity/key, an existing-setting conflict or an OS permission. A dependency that can be installed alongside the current runtime is not a conflict; replacing the default runtime, resetting credential helpers, moving data, replacing a remote service or changing a signing key is. Never invent identities or keys, export a private key without specific permission, disable signing, or treat recommended mode as consent to destructive changes. Continue independent approved components when one needs user input.
 
 ## 3. Execute only the approved plan
 
@@ -57,7 +82,7 @@ Do the configuration as well as binary installation: resolve the selected profil
 
 ## 4. Hindsight: reuse the existing implementation
 
-Choose the OMP profile first, verify its effective `config path`, and use that same child environment for every check/install. `OMP_PROFILE` selects a named profile; existing `PI_CONFIG_DIR`/`PI_CODING_AGENT_DIR` overrides must be understood, not silently removed. Resolve conflicts before changing the wrong target.
+Use the effective current OMP profile, or an explicitly requested different profile, and verify its `config path` before every check/install. Keep that same child environment throughout. `OMP_PROFILE` selects a named profile; existing `PI_CONFIG_DIR`/`PI_CODING_AGENT_DIR` overrides must be understood, not silently removed. Resolve conflicts before changing the wrong target.
 
 ```sh
 AI_KIT_CLIENT=omp OMP_PROFILE=selected-profile node ../../scripts/hindsight.mjs report
