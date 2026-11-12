@@ -1,10 +1,10 @@
 ---
 name: toolchain
-description: "Configure OMP with its native status-line preset, memory, Backlog, Whiteboard and Git with two questions: projects location, then recommended automatic setup or an all-selected custom list."
+description: "Configure OMP, memory, Backlog, Whiteboard, Git, direnv and language servers: projects location, then automatic/custom setup with free-form languages (Go and Python by default)."
 ---
 # Environment setup selector
 
-This is an agent-run setup flow, not an instruction sheet. Ask where projects belong, then offer "Реши все за меня" as the default. Execute the approved setup yourself, including dependencies and integrations. Reading the skill or displaying defaults is not installation approval. Do not resume a previously cancelled setup merely because the user requests changes to Ai-Kit itself.
+This is an agent-run setup flow, not an instruction sheet. Ask where projects belong, then offer "Реши все за меня" as the default with a free-form language field prefilled `go, python`. Execute the approved setup yourself, including dependencies and integrations. Reading the skill or displaying defaults is not installation approval. Do not resume a previously cancelled setup merely because the user requests changes to Ai-Kit itself.
 
 For an explicit check/report-only request, stop after read-only inventory and findings. Do not turn diagnostics into an installation prompt or any mutation.
 
@@ -30,19 +30,20 @@ Show one editable path, prefilled with the detected development root. If several
 
 Show only these two choices:
 
-- **Реши все за меня (рекомендуется)**, selected by default. Disclose that this installs missing recommended tools and their official package-manager/runtime dependencies, configures integrations and the native OMP status-line preset, and starts necessary local services while preserving existing settings, data and keys. A different custom status line requires explicit conflict resolution.
-- **Хочу выбрать сам**. Show one component list with every item selected by default; the user removes unwanted items. Do not follow it with another MCP, profile, service-mode or dependency questionnaire.
+- **Реши все за меня (рекомендуется)**, selected by default. Disclose that this installs missing recommended tools and their official package-manager/runtime dependencies, configures integrations, direnv's shell hook, LSP servers for the entered languages and the native OMP status-line preset, and starts necessary local services while preserving existing settings, data and keys. A different custom status line requires explicit conflict resolution. Project `.envrc` files are created only during explicit project setup, not across every checkout.
+- **Хочу выбрать сам**. Show one component list with every item selected by default; the user removes unwanted items. Do not follow it with another MCP, profile, service-mode or dependency questionnaire. Include the same free-form language input in that component form when the mode form did not already collect it.
 
 The native mode form can use this shape:
 
 ```html
 <form>
-<p>Агент установит недостающие инструменты и зависимости, подключит интеграции, настроит native статус-бар OMP и запустит нужные локальные сервисы. Рабочие настройки, данные и ключи сохраняются; отличающийся пользовательский бар не заменяется без согласования.</p>
+<p>Агент установит недостающие инструменты и зависимости, подключит интеграции, direnv и LSP для указанных языков, настроит native статус-бар OMP и запустит нужные локальные сервисы. Рабочие настройки, данные и ключи сохраняются; отличающийся пользовательский бар не заменяется без согласования. .envrc создается при настройке конкретного проекта.</p>
 <fieldset>
 <legend>Как настроить окружение?</legend>
-<label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP, память, Backlog, Whiteboard, Git/ghq/GCM, подписи и общие инструменты</label>
+<label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP, память, Backlog, Whiteboard, Git/ghq/GCM, подписи, direnv, LSP и общие инструменты</label>
 <label><input type="radio" name="setup_mode" value="custom"> Хочу выбрать сам</label>
 </fieldset>
+<label>Языки для LSP (свободный ввод, через пробел или запятую; пустое поле - без языков) <input type="text" name="languages" value="go, python"></label>
 </form>
 ```
 
@@ -56,9 +57,11 @@ In custom mode generate one native multi-select from the following table, with a
 | whiteboard | Whiteboard and its MCP connector; [Whiteboard setup](references/whiteboard.md) |
 | git-workspace | Git, ghq, GCM and existing-key signing; reuse `project-setup` |
 | tuicr | Terminal code review; `brew install tuicr` on macOS, [official installation methods](https://github.com/agavra/tuicr#install) elsewhere; verify `tuicr --version` |
+| direnv | Per-project environments and an active shell hook; [direnv setup](references/direnv.md) |
+| lsp | Install and configure native language servers for the free-form language answer; [LSP setup](references/lsp.md) |
 | python3, uv, docker, pre-commit, node, ripwire, jq, shellcheck, tre | One entry per common tool |
 
-Recommended mode selects every entry in this table. Git is included through `git-workspace`, not a duplicate checkbox. MCP is included with Backlog and Whiteboard, not a separate choice; Hindsight uses OMP's native backend. Custom servers are configured only when explicitly requested.
+Recommended mode selects every entry in this table. Git is included through `git-workspace`, not a duplicate checkbox. MCP is included with Backlog and Whiteboard, not a separate choice; Hindsight uses OMP's native backend. Additional MCP servers are configured only when explicitly requested. LSP is native, not MCP: install the servers for the user's language answer yourself. Normalize language aliases and duplicates as data, never shell input. Use `go, python` only when the field was not supplied; an explicitly empty field selects no languages. If `lsp` is deselected, ignore the language field and install no language-specific dependencies.
 
 Choose technical details yourself: retain the effective current OMP profile and its environment overrides; reuse healthy services and matching Git profiles; prefer an installed Whiteboard mode, otherwise Desktop on a supported graphical machine and headless on a server; use stdio for bundled MCP connectors and preserve appropriate existing client scopes. Keep generic user connectors generic and tracker-specific bindings project-local. Do not ask about these defaults merely because configuration has several possible shapes.
 
@@ -77,7 +80,7 @@ bash ../../scripts/toolchain.sh install jq shellcheck
 bash ../../scripts/toolchain.sh report jq shellcheck
 ```
 
-Do not pass advanced IDs such as `omp`, `whiteboard` or `mcp` to this helper; execute their linked native procedures. Deduplicate dependencies and order them before consumers. For local Hindsight, install approved missing binaries first, start Docker only if its startup was disclosed and approved, then run the Hindsight helper. Never use bare `install`, add unrelated tools to fix an exit status, run `eval` on user-supplied commands, or turn an absent app into a global failure for unselected components.
+Do not pass advanced IDs such as `omp`, `whiteboard`, `lsp` or `mcp` to this helper; execute their linked native procedures. The `direnv` helper entry installs/checks the binary only; complete and verify its shell hook through the linked procedure. Deduplicate dependencies and order them before consumers. For local Hindsight, install approved missing binaries first, start Docker only if its startup was disclosed and approved, then run the Hindsight helper. Never use bare `install`, add unrelated tools to fix an exit status, run `eval` on user-supplied commands, or turn an absent app into a global failure for unselected components.
 
 Do the configuration as well as binary installation: resolve the selected profile, preserve unrelated settings, write or merge only approved fields and verify effective values. Back up affected existing files privately. An existing server with a matching name is not permission to replace its complete definition or auth. Use argument arrays for custom executable/args and keep secrets in native credential storage or local environment references, never arguments or public files.
 

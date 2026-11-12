@@ -12,6 +12,7 @@ TOOLS=(
   "git|version control|xcode-select --install"
   "python3|Python tooling|brew install python@3.13"
   "uv|isolated Python environments|curl -LsSf https://astral.sh/uv/install.sh | sh"
+  "direnv|per-project environment loading|brew install direnv"
   "docker|explicit local service setup|brew install --cask docker"
   "pre-commit|repository quality hooks|uv tool install pre-commit"
   "node|JavaScript tooling and shared helpers|brew install node"
@@ -25,7 +26,7 @@ TOOLS=(
 
 usage() {
   printf 'Usage: toolchain.sh check|report [COMPONENT ...] | install COMPONENT ...\n' >&2
-  printf 'Components: git python3 uv docker pre-commit node ripwire tuicr jq shellcheck tre hindsight\n' >&2
+  printf 'Components: git python3 uv direnv docker pre-commit node ripwire tuicr jq shellcheck tre hindsight\n' >&2
 }
 
 case "$mode" in
