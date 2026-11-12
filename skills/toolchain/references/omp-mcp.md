@@ -20,10 +20,12 @@ After changes launch a fresh native process for the selected profile, inspect st
 
 ## Native status line
 
-OMP setup includes the portable [status-line preset](statusline.json). It uses
-native settings, not a shell wrapper or an extension. Plugin installation alone
-does not apply it; apply it only when OMP setup was selected, or when the user
-explicitly requested this preset. Check/report mode only compares values.
+OMP setup includes the portable [status-line and input-panel preset](statusline.json).
+The status line uses native settings; the quota panel uses the bundled
+`omp/input-panel.ts` extension and the `ai-kit.input-panel` composer shape.
+Plugin installation registers the shape but does not select it. Apply the preset
+only when OMP setup was selected, or explicitly requested. Check/report mode only
+compares values.
 
 Resolve the selected profile and inspect effective settings plus explicit global
 and project layers before writing. If the preset already matches, reuse it without
@@ -33,13 +35,21 @@ or replace only the preset-owned values; recommended setup is not permission to
 silently overwrite a custom bar. Resolve conflicting project/environment overrides
 before writing profile settings that would remain ineffective.
 
+Include `composer.shape` in this comparison and conflict handling. Apply it with
+native `config set composer.shape ai-kit.input-panel` only after verifying that
+the updated Ai-Kit plugin is loaded and the shape is registered. Do not copy a
+personal extension path. A legacy local `input-panel.framed` is a separate
+customization: preserve it unless replacement is approved; after approval switch
+the shape and remove only that legacy input-panel entry from `extensions`,
+retaining the file and all other extension entries.
+
 Privately back up the selected profile's existing configuration, if any. Apply
 each `statusLine` entry with native `config set statusLine.<key> <value>` in that
 same profile. Pass strings literally and arrays, booleans and records as JSON
 arguments, never interpreted shell text. For `segmentOptions`, merge the preset's
 model/path/git options into the existing record, retaining other segment entries
 and option keys. Preserve every setting outside this preset, including theme,
-composer, models, credentials and unrelated footer settings.
+other composer options, models, credentials and unrelated footer settings.
 
 This complete preset is verified with OMP 18.19.0. Do not silently drop unsupported
 settings or segments on older versions; report the compatibility conflict before
@@ -49,6 +59,16 @@ turn. Verify segment order, context percentage, session name and transparent
 rendering. Native conditional segments remain hidden when there is nothing to show:
 cost before usage, PR outside a pull request, or session name before naming.
 Repeating setup against matching values must not rewrite configuration.
+
+Verify the input panel in a fresh TUI on OMP 18.19.0 with Codex selected and the
+editor idle: it shows account usage percent, reset countdown and a Monday-first
+calendar highlighting today when a weekly reset is available. Multiple windows
+are labeled separately. Data comes from the active native Codex account through
+the usage API, not a model request; no credentials are bundled or copied.
+Refresh runs at startup, every minute, after turns and session switches.
+Missing usage displays `Usage unavailable`; other providers, active generation,
+long/multiline input and narrow space suppress the hint without hiding input.
+The frame's short trailing meter reflects the highest reported usage fraction.
 
 ## MCP selection and scope
 
