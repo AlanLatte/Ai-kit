@@ -1,6 +1,6 @@
 ---
 name: toolchain
-description: "Configure OMP, memory, Backlog, Whiteboard and Git with two questions: projects location, then recommended automatic setup or an all-selected custom list."
+description: "Configure OMP with its native status-line preset, memory, Backlog, Whiteboard and Git with two questions: projects location, then recommended automatic setup or an all-selected custom list."
 ---
 # Environment setup selector
 
@@ -30,14 +30,14 @@ Show one editable path, prefilled with the detected development root. If several
 
 Show only these two choices:
 
-- **Реши все за меня (рекомендуется)**, selected by default. Disclose that this installs missing recommended tools and their official package-manager/runtime dependencies, configures integrations and starts necessary local services while preserving existing settings, data and keys.
+- **Реши все за меня (рекомендуется)**, selected by default. Disclose that this installs missing recommended tools and their official package-manager/runtime dependencies, configures integrations and the native OMP status-line preset, and starts necessary local services while preserving existing settings, data and keys. A different custom status line requires explicit conflict resolution.
 - **Хочу выбрать сам**. Show one component list with every item selected by default; the user removes unwanted items. Do not follow it with another MCP, profile, service-mode or dependency questionnaire.
 
 The native mode form can use this shape:
 
 ```html
 <form>
-<p>Агент установит недостающие инструменты и зависимости, подключит интеграции и запустит нужные локальные сервисы. Рабочие настройки, данные и ключи сохраняются.</p>
+<p>Агент установит недостающие инструменты и зависимости, подключит интеграции, настроит native статус-бар OMP и запустит нужные локальные сервисы. Рабочие настройки, данные и ключи сохраняются; отличающийся пользовательский бар не заменяется без согласования.</p>
 <fieldset>
 <legend>Как настроить окружение?</legend>
 <label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP, память, Backlog, Whiteboard, Git/ghq/GCM, подписи и общие инструменты</label>
@@ -50,7 +50,7 @@ In custom mode generate one native multi-select from the following table, with a
 
 | ID | Component and included setup |
 |---|---|
-| omp | OMP in the current profile; [OMP/MCP setup](references/omp-mcp.md) |
+| omp | OMP in the current profile, including its portable native status line; [OMP/MCP setup](references/omp-mcp.md#native-status-line) |
 | hindsight | Native Hindsight memory; existing helper and section4 below |
 | backlog | Backlog.md and its MCP connector; reuse an existing owning tracker, [Backlog setup](references/backlog.md) |
 | whiteboard | Whiteboard and its MCP connector; [Whiteboard setup](references/whiteboard.md) |

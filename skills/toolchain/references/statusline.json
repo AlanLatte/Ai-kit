@@ -1,0 +1,44 @@
+{
+  "statusLine": {
+    "preset": "custom",
+    "separator": "powerline-thin",
+    "contextLine": "percentage",
+    "sessionAccent": false,
+    "transparent": true,
+    "compactThinkingLevel": false,
+    "showHookStatus": false,
+    "leftSegments": [
+      "pi",
+      "status",
+      "vim",
+      "model",
+      "mode",
+      "collab",
+      "stream",
+      "path",
+      "git",
+      "pr",
+      "cost"
+    ],
+    "rightSegments": [
+      "context_pct",
+      "session_name"
+    ],
+    "segmentOptions": {
+      "model": {
+        "showThinkingLevel": true
+      },
+      "path": {
+        "abbreviate": true,
+        "maxLength": 40,
+        "stripWorkPrefix": true
+      },
+      "git": {
+        "showBranch": true,
+        "showStaged": true,
+        "showUnstaged": true,
+        "showUntracked": true
+      }
+    }
+  }
+}
