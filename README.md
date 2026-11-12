@@ -76,6 +76,8 @@ AI_KIT_CLIENT=omp bash scripts/toolchain.sh install jq shellcheck
 
 Существующие Compose/env, контейнеры и volume сохраняются. Локальный пример сервиса закреплен digest и слушает только loopback. Credentials вводятся приватно; чужая provider auth не копируется. Выбранный remote endpoint и другой memory backend не заменяются автоматически. В OMP используется встроенный Hindsight backend, не дополнительный MCP-сервер.
 
+Новая локальная установка ограничивает native CPU-пулы двумя потоками, запускает один local rerank одновременно, включает bucket batching и задает интервал автообновления сводок 30 минут. Явные интервалы банка/сводки имеют приоритет; существующие установки не мигрируются. Подробности и восстановление после сбоев: [docs/memory.md](docs/memory.md#local-cpu-inference-and-refresh-recovery).
+
 Общий inventory не включает Git-host/deploy зависимости конкретных продуктов. Их проверяют проектные пакеты.
 
 ## Проверка

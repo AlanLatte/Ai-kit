@@ -100,9 +100,9 @@ last stage label can still name an LLM call while a retrieval tool is running.
 Use trace scope, duration and error to distinguish provider latency from local
 embedding or reranking work.
 
-For a CPU-bound local reranker, benchmark bounded native thread pools and one
-concurrent rerank before reducing search coverage or raising timeouts. An initial
-profile to measure in the existing private Compose service's `environment` is:
+New local installations use bounded native thread pools, one concurrent local
+rerank, length-bucket batching and a 30-minute default automatic mental-model
+refresh interval. The pinned Compose template supplies this profile:
 
 ```yaml
 OMP_NUM_THREADS: "2"
@@ -111,14 +111,21 @@ MKL_NUM_THREADS: "2"
 NUMEXPR_NUM_THREADS: "2"
 HINDSIGHT_API_RERANKER_LOCAL_MAX_CONCURRENT: "1"
 HINDSIGHT_API_RERANKER_LOCAL_BUCKET_BATCHING: "true"
+HINDSIGHT_API_MENTAL_MODEL_MIN_REFRESH_INTERVAL_SECONDS: "1800"
 ```
 
 Keep the same model and candidate set for before/after measurements. Check score
 and ranking agreement as well as latency, including simultaneous refreshes and
-queueing. These values are a tuning starting point, not a hardware-independent
-optimum. Native pool settings take effect at process startup; applying them to an
+queueing. These defaults are a tuning starting point, not a hardware-independent
+optimum. Explicit bank or per-model refresh intervals take precedence over the
+server default. OMP 18.19.0's built-in seeds omit a per-model interval and inherit
+it; existing models with an explicit interval retain that value.
+
+Existing installations are not migrated or recreated by reinstalling Ai-Kit:
+the helper preserves their private Compose/env files and reuses their containers.
+Native pool settings take effect at process startup; applying this profile to an
 existing Compose container requires an explicit recreation, preserving its image,
-credentials and data volume. The installation helper deliberately does not do this.
+credentials and data volume.
 
 After tuning, explicitly refresh failed models through
 `POST /v1/default/banks/{bank_id}/mental-models/{mental_model_id}/refresh`.
