@@ -12,6 +12,13 @@ services:
       - llm.env
     environment:
       HINDSIGHT_API_WORKER_ID: hindsight-local
+      OMP_NUM_THREADS: "2"
+      OPENBLAS_NUM_THREADS: "2"
+      MKL_NUM_THREADS: "2"
+      NUMEXPR_NUM_THREADS: "2"
+      HINDSIGHT_API_RERANKER_LOCAL_MAX_CONCURRENT: "1"
+      HINDSIGHT_API_RERANKER_LOCAL_BUCKET_BATCHING: "true"
+      HINDSIGHT_API_MENTAL_MODEL_MIN_REFRESH_INTERVAL_SECONDS: "1800"
     volumes:
       - hindsight-data:/home/hindsight/.pg0
     healthcheck:

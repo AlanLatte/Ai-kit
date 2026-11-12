@@ -86,6 +86,58 @@ global personal instructions, not in a project bank used as a cross-project
 fallback. This preparation does not edit those instructions or reduce recall
 limits.
 
+## Local CPU inference and refresh recovery
+
+Consolidation produces observations without replacing the source facts. Node and
+link counts need not shrink when consolidation works. Check bank statistics for
+`pending_consolidation`, `failed_consolidation` and `last_consolidated_at`;
+check mental models separately for `is_stale` and `last_refresh_failed_at`.
+
+On Hindsight 1.1.0, a failed mental-model refresh pauses its automatic refreshes.
+A healthy service and an empty consolidation queue do not clear that pause.
+Inspect failed operations and LLM request traces before retrying: the worker's
+last stage label can still name an LLM call while a retrieval tool is running.
+Use trace scope, duration and error to distinguish provider latency from local
+embedding or reranking work.
+
+New local installations use bounded native thread pools, one concurrent local
+rerank, length-bucket batching and a 30-minute default automatic mental-model
+refresh interval. The pinned Compose template supplies this profile:
+
+```yaml
+OMP_NUM_THREADS: "2"
+OPENBLAS_NUM_THREADS: "2"
+MKL_NUM_THREADS: "2"
+NUMEXPR_NUM_THREADS: "2"
+HINDSIGHT_API_RERANKER_LOCAL_MAX_CONCURRENT: "1"
+HINDSIGHT_API_RERANKER_LOCAL_BUCKET_BATCHING: "true"
+HINDSIGHT_API_MENTAL_MODEL_MIN_REFRESH_INTERVAL_SECONDS: "1800"
+```
+
+Keep the same model and candidate set for before/after measurements. Check score
+and ranking agreement as well as latency, including simultaneous refreshes and
+queueing. These defaults are a tuning starting point, not a hardware-independent
+optimum. Explicit bank or per-model refresh intervals take precedence over the
+server default. OMP 18.19.0's built-in seeds omit a per-model interval and inherit
+it; existing models with an explicit interval retain that value.
+
+Existing installations are not migrated or recreated by reinstalling Ai-Kit:
+the helper preserves their private Compose/env files and reuses their containers.
+Native pool settings take effect at process startup; applying this profile to an
+existing Compose container requires an explicit recreation, preserving its image,
+credentials and data volume.
+
+After tuning, explicitly refresh failed models through
+`POST /v1/default/banks/{bank_id}/mental-models/{mental_model_id}/refresh`.
+Verify operation completion, nonempty content, a cleared failure marker and
+freshness, then exercise automatic refresh after retain/consolidation separately.
+For less frequent full rebuilds, patch the model trigger's
+`min_refresh_interval_seconds` to `1800`, retaining
+`refresh_after_consolidation: true` and its existing mode and scope. Early automatic
+refreshes are queued until the interval expires, not discarded; explicit refreshes
+ignore the interval. Back up local configuration first. Do not delete memories,
+change retrieval budgets or switch full models to delta as part of CPU tuning.
+
 ## Verification boundary
 
 `node --test tests/memory.test.mjs` exercises one deterministic behavioral
