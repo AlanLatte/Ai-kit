@@ -20,7 +20,7 @@ function fixture(t, { ready = false, missing = [], installReady = false, install
   writeFileSync(calls, "");
   if (ready) writeFileSync(state, "ready");
   symlinkSync("/usr/bin/dirname", join(bin, "dirname"));
-  for (const name of ["git", "python3", "uv", "docker", "pre-commit", "ripwire", "jq", "shellcheck", "tre"]) {
+  for (const name of ["git", "python3", "uv", "docker", "pre-commit", "ripwire", "tuicr", "jq", "shellcheck", "tre"]) {
     if (!missing.includes(name)) writeFileSync(join(bin, name), "#!/bin/bash\nexit 0\n", { mode: 0o755 });
   }
   writeFileSync(join(bin, "brew"), '#!/bin/bash\nprintf "brew %s\\n" "$*" >> "$CALLS"\nexit "$BREW_STATUS"\n', { mode: 0o755 });
@@ -64,11 +64,13 @@ test("empty, unknown and mixed-invalid selections reject before any installer or
 });
 
 test("a binary-only selection does not inspect or configure Hindsight", (t) => {
-  const context = fixture(t, { missing: ["jq"], installReady: true });
-  const result = context.run("install", "jq");
-  assert.equal(result.status, 1);
-  assert.deepEqual(context.calls(), ["brew install jq"]);
-  assert.equal(existsSync(context.state), false);
+  for (const name of ["jq", "tuicr"]) {
+    const context = fixture(t, { missing: [name], installReady: true });
+    const result = context.run("install", name);
+    assert.equal(result.status, 1);
+    assert.deepEqual(context.calls(), [`brew install ${name}`]);
+    assert.equal(existsSync(context.state), false);
+  }
 });
 
 test("selected report does not inspect unselected service configuration", (t) => {
@@ -86,7 +88,7 @@ test("unselected missing tools do not fail a successful selected service setup",
 
 test("healthy selected installations are reused without another install", (t) => {
   const context = fixture(t, { ready: true });
-  assert.equal(context.run("install", "hindsight", "jq").status, 0);
+  assert.equal(context.run("install", "hindsight", "jq", "tuicr").status, 0);
   assert.ok(context.calls().every((call) => call === "hindsight check"));
   assert.equal(existsSync(context.state), true);
 });

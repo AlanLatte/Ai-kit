@@ -55,6 +55,7 @@ In custom mode generate one native multi-select from the following table, with a
 | backlog | Backlog.md and its MCP connector; reuse an existing owning tracker, [Backlog setup](references/backlog.md) |
 | whiteboard | Whiteboard and its MCP connector; [Whiteboard setup](references/whiteboard.md) |
 | git-workspace | Git, ghq, GCM and existing-key signing; reuse `project-setup` |
+| tuicr | Terminal code review; `brew install tuicr` on macOS, [official installation methods](https://github.com/agavra/tuicr#install) elsewhere; verify `tuicr --version` |
 | python3, uv, docker, pre-commit, node, ripwire, jq, shellcheck, tre | One entry per common tool |
 
 Recommended mode selects every entry in this table. Git is included through `git-workspace`, not a duplicate checkbox. MCP is included with Backlog and Whiteboard, not a separate choice; Hindsight uses OMP's native backend. Custom servers are configured only when explicitly requested.

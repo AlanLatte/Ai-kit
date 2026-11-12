@@ -16,6 +16,7 @@ TOOLS=(
   "pre-commit|repository quality hooks|uv tool install pre-commit"
   "node|JavaScript tooling and shared helpers|brew install node"
   "ripwire|focused code navigation|brew install ripwire"
+  "tuicr|terminal code review|brew install tuicr"
   "jq|JSON inspection|brew install jq"
   "shellcheck|shell script diagnostics|brew install shellcheck"
   "tre|directory inspection|brew install tre-command"
@@ -24,7 +25,7 @@ TOOLS=(
 
 usage() {
   printf 'Usage: toolchain.sh check|report [COMPONENT ...] | install COMPONENT ...\n' >&2
-  printf 'Components: git python3 uv docker pre-commit node ripwire jq shellcheck tre hindsight\n' >&2
+  printf 'Components: git python3 uv docker pre-commit node ripwire tuicr jq shellcheck tre hindsight\n' >&2
 }
 
 case "$mode" in
