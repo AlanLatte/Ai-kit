@@ -11,7 +11,8 @@
   "omp": {
     "extensions": [
       "./omp/ponytail.mjs",
-      "./omp/memory.mjs"
+      "./omp/memory.mjs",
+      "./omp/input-panel.ts"
     ]
   },
   "scripts": {

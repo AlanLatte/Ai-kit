@@ -1,4 +1,7 @@
 {
+  "composer": {
+    "shape": "ai-kit.input-panel"
+  },
   "statusLine": {
     "preset": "custom",
     "separator": "powerline-thin",
