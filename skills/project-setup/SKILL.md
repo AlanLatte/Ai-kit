@@ -1,12 +1,12 @@
 ---
 name: project-setup
-description: Create or connect a project workspace with ghq, scoped Git profiles, GCM authentication and existing SSH signing keys independent of Bitwarden.
+description: Create or connect a project workspace with ghq, scoped Git profiles, GCM authentication, existing SSH signing keys and a direnv .envrc.
 ---
 # Project and Git setup
 
 Set up a workspace or repository only when requested. Adding or reading this skill does not authorize installation, account changes, key export, remote creation or publication. Keep project descriptions, actual hosts/accounts/paths, private keys and local configuration out of Ai-Kit.
 
-When called by `toolchain` for recommended environment setup, reuse its approved projects location and existing matching workspace profiles. Do not show another root/workspace/account or clone-versus-new questionnaire, create a repository, invent a new identity or rewrite every workspace under that root. Install missing Git/ghq/GCM prerequisites, preserve existing routing and verify matching identity/signing settings. Ask only for a genuinely missing identity/key, private authentication or an actual configuration conflict. The project-creation questions below apply only when a project was explicitly requested.
+When called by `toolchain` for recommended environment setup, reuse its approved projects location and existing matching workspace profiles. Do not show another root/workspace/account or clone-versus-new questionnaire, create a repository, invent a new identity or rewrite every workspace under that root. Install missing Git/ghq/GCM prerequisites, preserve existing routing and verify matching identity/signing settings. The separately selected direnv component owns the shell hook; create `.envrc` only for an explicitly selected project, never for a development root or every checkout. Ask only for a genuinely missing identity/key, private authentication or an actual configuration conflict. The project-creation questions below apply only when a project was explicitly requested.
 
 ## 1. Discover before changing
 
@@ -107,6 +107,14 @@ For existing SSH signing keys on macOS, read [references/ssh-signing.md](referen
 Verify the actual checkout's root, remote, author name/email, signing public key and `gpg.ssh.program` with configuration origins. Check a neighboring workspace for identity isolation. Verify ghq's resolved location rather than only the configuration text. With remote-access authorization, a read-only remote check proves access, not account identity or write permission.
 
 Signing acceptance requires the same fingerprint and a successful cryptographically verified signature with the password-manager socket unavailable, including reloading into a fresh dedicated agent. Use a throwaway signed Git commit outside application repositories if testing the Git integration. Never restart or empty a shared agent containing another session's keys. Report what was installed or changed, actual checks, Keychain interaction or missing prerequisites, and how to restore the affected local files. Leave an incomplete signing change inactive.
+
+## 7. Configure the project environment
+
+Project setup includes direnv installation, its shell hook and a repository-root `.envrc`; follow [the environment procedure](../toolchain/references/direnv.md). Reuse an existing `.envrc` without replacing it. For a missing file copy [templates/envrc](templates/envrc), then add only environment requirements established by the actual project. The template loads an optional private `.env` and activates an existing `.venv`, without creating a virtual environment, installing dependencies or pinning a runtime.
+
+Preserve the project's existing env manager, lockfiles and Python environment path. Adapt the template to a different established venv path rather than introducing a second environment. Do not use `layout python` in a uv-managed project. Ensure `.env`, `.venv/` and `.direnv/` are ignored before loading private values; keep a secret-free `.envrc` trackable. Never copy real environment values into the template or Ai-Kit.
+
+Review `.envrc` and every executable file it sources before `direnv allow`; do not whitelist a parent directory or automatically trust scripts from a cloned repository. Verify with `direnv exec <project> <command>` using the project's actual interpreter/toolchain without printing environment values. Check the shell hook loads on entry and unloads on exit. Start or restart OMP from that activated project shell so its language servers inherit the same PATH and environment.
 
 ## Authoritative references
 
