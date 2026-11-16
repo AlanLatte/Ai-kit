@@ -5,6 +5,8 @@ description: "Use for Backlog.md task and document work: find existing work, cre
 
 # Backlog.md
 
+Apply `skill://no-ai-slop` silently to authored task titles, descriptions, comments, decisions, documents and final summaries. Reuse the available draft/context; preserve acceptance criteria, commitments, evidence, risks and the tracker's required language, metadata and format. Do not append an editing report or treat prose editing as permission to write or publish.
+
 ## Resolve the owning tracker first
 
 Resolve the effective target directory, not merely the terminal's starting directory. Use canonical filesystem paths and directory-component containment, not path prefixes or a repository's display name. A workspace may contain independent nested Git repositories; crossing a Git root does not by itself end the workspace's tracker scope. Tracker ownership does not grant another repository's code conventions or access permissions.

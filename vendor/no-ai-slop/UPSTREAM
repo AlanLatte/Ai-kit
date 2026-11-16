@@ -1,0 +1,17 @@
+Upstream: https://github.com/petergyang/no-ai-slop
+Commit: 000650b156983f5159695b441477f4e63b25dc85
+License: MIT, Copyright (c) 2026 Peter Yang (see LICENSE).
+
+Unmodified files from this commit:
+  skills/no-ai-slop/SKILL.md -> SKILL.md
+    Git blob: e2008aa08d688846b0373b83d7c3d33b85eaabdd
+  skills/no-ai-slop/eval.md -> eval.md
+    Git blob: e912b3e9246ded24b14116682c23702a4d083dc7
+  LICENSE -> LICENSE
+    Git blob: 644ebee1944d0e7d03c66a25977ff0a8a8e1c7ae
+
+No upstream scripts, agents, assets or plugin runtime are included.
+The sole public skill is ../../skills/no-ai-slop/SKILL.md; this vendor
+folder is outside the declared skill discovery roots. That local MIT
+wrapper adds silent embedded engineering-prose semantics without changing
+these upstream files. Native prompt registration is ../../omp/no-ai-slop.mjs.
