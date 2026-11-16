@@ -18,6 +18,23 @@ If authentication is actually missing, use the client's native login UI for the 
 
 After changes launch a fresh native process for the selected profile, inspect state and available commands without a model turn, and verify the intended settings layer. Do not send a paid/model request as a generic setup test.
 
+## Native token rate
+
+Approved OMP setup includes the native tokens/sec display. In the effective
+selected profile, inspect `omp config get composer.tokenRate --json` and the
+explicit global/project layers. Reuse an effective `true` without writing.
+Otherwise, privately back up the profile configuration and run
+`omp config set composer.tokenRate true` in that same profile/environment,
+resolving any project/environment override first. This changes only token-rate
+visibility, preserving `statusLine`, `composer.shape` and other composer settings.
+Check/report and workspace-only inventory flows only inspect the value.
+
+Verify `composer.tokenRate` is effectively `true` through native
+`config get composer.tokenRate --json` in a fresh process at the target cwd.
+OMP 18.20.2 exposes this boolean: the readout appears on the working row or native
+composer bar during generation. Report configuration readiness separately from
+visual confirmation; a model-free check cannot prove the live tokens/sec display.
+
 ## Native status line
 
 OMP setup includes the portable [status-line and input-panel preset](statusline.json).

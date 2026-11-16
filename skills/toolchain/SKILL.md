@@ -53,14 +53,14 @@ Show one editable path, prefilled with the detected development root. If several
 
 Show only these two choices:
 
-- **Реши все за меня (рекомендуется)**, selected by default. Disclose that this installs missing recommended tools and their official package-manager/runtime dependencies, configures integrations, direnv's shell hook, LSP servers for the entered languages and the native OMP status-line preset, and starts necessary local services while preserving existing settings, data and keys. A different custom status line requires explicit conflict resolution. Project `.envrc` files are created only during explicit project setup, not across every checkout.
+- **Реши все за меня (рекомендуется)**, selected by default. Disclose that this installs missing recommended tools and their official package-manager/runtime dependencies, configures integrations, direnv's shell hook, LSP servers for the entered languages, the native OMP status-line preset and tokens/sec display, and starts necessary local services while preserving existing settings, data and keys. A different custom status line requires explicit conflict resolution. Project `.envrc` files are created only during explicit project setup, not across every checkout.
 - **Хочу выбрать сам**. Show one component list with every item selected by default; the user removes unwanted items. Do not follow it with another MCP, profile, service-mode or dependency questionnaire. Include the same free-form language input in that component form when the mode form did not already collect it.
 
 The native mode form can use this shape:
 
 ```html
 <form>
-<p>Агент установит недостающие инструменты и зависимости, подключит интеграции, direnv и LSP для указанных языков, настроит native статус-бар OMP и запустит нужные локальные сервисы. Рабочие настройки, данные и ключи сохраняются; отличающийся пользовательский бар не заменяется без согласования. .envrc создается при настройке конкретного проекта.</p>
+<p>The agent installs missing tools and dependencies, configures integrations, direnv, LSP for the entered languages, the native OMP status line and tokens/sec display, and starts necessary local services. Existing settings, data and keys are preserved; a different custom bar requires agreement before replacement. .envrc is created during individual project setup.</p>
 <fieldset>
 <legend>Как настроить окружение?</legend>
 <label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP, память, Backlog, Whiteboard, Git/ghq/GCM, подписи, direnv, LSP и общие инструменты</label>
@@ -74,7 +74,7 @@ In custom mode generate one native multi-select from the following table, with a
 
 | ID | Component and included setup |
 |---|---|
-| omp | OMP in the current profile, including its portable native status line; [OMP/MCP setup](references/omp-mcp.md#native-status-line) |
+| omp | OMP in the current profile, including its portable native status line and tokens/sec display; [OMP/MCP setup](references/omp-mcp.md#native-token-rate) |
 | hindsight | Native Hindsight memory; existing helper and section4 below |
 | backlog | Backlog.md and its MCP connector; reuse an existing owning tracker, [Backlog setup](references/backlog.md) |
 | whiteboard | Whiteboard and its MCP connector; [Whiteboard setup](references/whiteboard.md) |

@@ -1,6 +1,6 @@
 {
   "name": "ai-kit",
-  "version": "0.4.6",
+  "version": "0.4.7",
   "private": true,
   "type": "module",
   "description": "Personal native OMP tooling without project policies",
