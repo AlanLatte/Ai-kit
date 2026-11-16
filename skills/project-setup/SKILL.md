@@ -14,9 +14,9 @@ When called by `toolchain` for recommended environment setup, reuse its approved
 
 ## 1. Discover before changing
 
-A workspace is the existing root of related independent repository checkouts and shared configuration, often its own `.gitconfig`, tracker and client/environment settings. Its parent development directory is only a location for workspaces. Use the root the user supplies or existing configuration establishes; do not insert a new directory layer, initialize the workspace as a Git repository or invent another profile.
+A workspace is the existing root of related independent repository checkouts and shared configuration: its tracker, client/environment settings and scoped Git profile. Ai-Kit's [workspace-local layout](references/workspace-layout.md) owns `.config/bin`, `libexec`, `git/config` and any unit templates. Reuse the supplied canonical root; do not insert a new layer, initialize it as a repository or invent another profile.
 
-Inspect the OS, shell, installed `git`, `ghq` and `git credential-manager --version`, existing `ghq root --all`, `GHQ_ROOT`, conditional Git includes and relevant workspace `.gitconfig`/`.config`. In an existing checkout use `git rev-parse --show-toplevel --git-dir --git-common-dir` and `git remote -v`. Inspect configuration sources with `git config --show-origin --get <key>`; do not dump credentials or helper commands containing secrets.
+Inspect the OS, shell, installed `git`, `ghq` and `git credential-manager --version`, existing `ghq root --all`, `GHQ_ROOT`, conditional Git includes and the actual workspace profile/configuration paths. For existing layouts, discover legacy root `.gitconfig` consumers before proposing a migration; its presence alone does not authorize one. In a checkout inspect its Git/common directory and remote. Do not dump credentials or secret-bearing helper values.
 
 Reuse the existing development root and directory layout. If none exists, propose a configurable root such as `~/Developments`; never assume its spelling, case or that it must be on the home volume. Ask together only for missing decisions: root/workspace, clone versus new repository, canonical remote and protocol, author identity, authentication account, existing signing-key fingerprint and initial branch policy. Do not infer author name/email from a host login.
 
@@ -37,28 +37,23 @@ Skip already installed tools; do not install Homebrew silently. GCM installers c
 
 ## 3. Keep workspace configuration local
 
-Use the existing layout or this neutral structure:
+Read and apply the shared [workspace-local configuration contract](references/workspace-layout.md).
+Keep workspace commands in `.config/bin`, supporting payloads in
+`.config/libexec`, the canonical scoped Git profile in `.config/git/config`,
+and only existing/needed unit templates in `.config/systemd`. Root `.envrc`,
+mise config/lock, `.omp`, markers and tracker files keep native locations.
+Never redirect global `XDG_CONFIG_HOME` or put private keys/credentials here.
 
-```text
-<development-root>/<workspace>/
-  .gitconfig
-  .config/
-    git-sign.sh
-    signing.gitconfig
-  <host>/<owner>/<repository>/
-~/.ssh/signing/
-  <profile>
-  <profile>.pub
-  agent.sock
-```
-
-`.config` contains scripts and configuration, never private key material. `.gitconfig`, `.config` and `.ssh` remain outside application repositories and are not copied into Ai-Kit. Do not add secrets to a repository's excludes as a substitute for keeping them outside it.
+New workspace setup follows this layout. A working installation's existing
+locations need inventory and all-consumer proof before an explicitly approved
+cutover; a tools-only request must not silently migrate Git/auth/services.
+Reuse approved user-global stores/launchers instead of duplicating them.
 
 Add an idempotent conditional include to the existing global Git configuration, using an absolute canonical workspace prefix with a trailing slash:
 
 ```gitconfig
 [includeIf "gitdir:/absolute/development-root/workspace/"]
-    path = /absolute/development-root/workspace/.gitconfig
+    path = /absolute/development-root/workspace/.config/git/config
 ```
 
 Set the approved author name/email in the workspace profile using `git config --file <profile>`. Preserve the existing signing public key, fingerprint and signing requirements. Do not set a global author as a shortcut. Git uses matching Git directories, not the current shell directory; `includeIf` does not activate merely by entering a non-Git workspace. Later configuration and repository-local overrides can win: verify effective values inside a real checkout before a first commit.
@@ -122,6 +117,9 @@ and [shared workspace toolchain procedure](../toolchain/references/workspace.md)
 Ai-Kit owns mise bootstrap and activation; the project kit owns inventory and
 compatibility, the workspace owns pins/locks/`.envrc`, and repositories retain
 their native lockfiles, venv paths, Bundler and other dependency runners.
+Workspace `.config` placement and migration checks come from
+[the shared layout](references/workspace-layout.md), not another kit-specific
+directory convention. Preserve global credentials/config and native root files.
 
 Inspect an existing `.envrc` and sourced code before changing or allowing it.
 Preserve its secret loading, policy wrappers and mise dependency. Merge only

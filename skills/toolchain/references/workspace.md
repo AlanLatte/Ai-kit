@@ -3,10 +3,11 @@
 This is an agent-run procedure using native mise, not an installer script. A caller supplies the canonical workspace root and its entire declared tool inventory: tool/backend identifiers, executables, version constraints and any required runtime dependencies. Keep project inventories and conventions in the caller, not Ai-Kit. Explicit workspace setup authorizes installing that full inventory, including tools unrelated to the current task. Never silently narrow it to tools currently needed or already on PATH. An empty or missing inventory is not permission to choose the machine-wide baseline.
 
 A workspace is the user's existing coordination root containing independent
-repository checkouts and shared configuration, commonly `.gitconfig`, a tracker,
-client settings and `.envrc`. Its name and location come from the selected scope
-and existing configuration. Reuse that root; do not add another parent directory,
-turn it into a monorepo or require a `.gitconfig` file as a universal marker.
+repository checkouts, tracker, client settings and `.envrc`. Ai-Kit's
+[workspace-local configuration contract](../../project-setup/references/workspace-layout.md)
+defines secret-free `.config/bin`, `.config/libexec`, `.config/git/config` and
+unit template placement. Reuse the supplied canonical root and preserve its
+native files; neither `.config` nor a legacy root `.gitconfig` is a kit marker.
 A repository is one checkout inside it; a development root can contain several
 workspaces and is not itself an installation target.
 
@@ -16,6 +17,13 @@ in the plugin. Project kits own inventories, compatibility constraints and acces
 policy. Each workspace owns its `mise.toml`, supported `mise.lock` and `.envrc`;
 repositories retain their own pins, lockfiles and native runners. There is no
 machine-wide default tool selection and no separate environment per plugin.
+
+During approved setup, inspect workspace-local configuration as well as tool
+pins. Only the root files and missing activation/layout entries in the approved
+scope may change. Never redefine global `XDG_CONFIG_HOME`, move credentials/state
+into `.config`, copy tool installations there, or overwrite an existing command
+policy wrapper. Existing layout migrations require explicit all-consumer cutover;
+the tools-only flow reports unrelated Git/auth/service work without doing it.
 
 ## 1. Select scope and inspect without mutation
 

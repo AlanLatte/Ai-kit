@@ -10,8 +10,10 @@ Apply `skill://no-ai-slop` silently to authored questions, setup explanations, r
 
 For an explicit workspace toolchain setup/check/report, including a project-kit delegation with a workspace root and declared tool inventory, follow [the workspace procedure](references/workspace.md) and stop after that flow. Install the ENTIRE caller-declared inventory on approved setup, not just current-task tools. This targeted flow does not run the machine-wide inventory, questionnaire or common installer below and does not authorize authentication, key/credential changes or services. Startup and report remain read-only; no automatic installation. Keep project inventories in their owning plugins.
 
-A workspace is the existing root of related independent repositories and shared
-configuration, often including its own `.gitconfig`, tracker and client settings.
+A workspace is the existing root of related repositories, shared tracker and
+client/environment settings. Ai-Kit's [local `.config` layout](../project-setup/references/workspace-layout.md)
+defines scoped commands, payloads, Git profile and unit templates, without
+redirecting global configuration, credentials or native root files.
 Reuse the supplied root; do not create another directory layer, Git repository
 or profile. Ai-Kit owns the shared external mise setup and direnv activation;
 the owning project kit supplies the complete inventory and constraints. The
