@@ -6,6 +6,8 @@ description: Create or connect a project workspace with ghq, scoped Git profiles
 
 Set up a workspace or repository only when requested. Adding or reading this skill does not authorize installation, account changes, key export, remote creation or publication. Keep project descriptions, actual hosts/accounts/paths, private keys and local configuration out of Ai-Kit.
 
+For a request limited to project/workspace tool binaries, delegate directly to [the workspace toolchain procedure](../toolchain/references/workspace.md) with the workspace root and the full owning-kit inventory; do not run the Git/auth/signing setup below. When tools are requested alongside project creation, use that same procedure for the complete declared inventory, preserving repository runners and pins. This is separate from shared user bootstrap prerequisites and never implies workflow authentication or service readiness.
+
 When called by `toolchain` for recommended environment setup, reuse its approved projects location and existing matching workspace profiles. Do not show another root/workspace/account or clone-versus-new questionnaire, create a repository, invent a new identity or rewrite every workspace under that root. Install missing Git/ghq/GCM prerequisites, preserve existing routing and verify matching identity/signing settings. The separately selected direnv component owns the shell hook; create `.envrc` only for an explicitly selected project, never for a development root or every checkout. Ask only for a genuinely missing identity/key, private authentication or an actual configuration conflict. The project-creation questions below apply only when a project was explicitly requested.
 
 ## 1. Discover before changing
@@ -114,7 +116,9 @@ Project setup includes direnv installation, its shell hook and a repository-root
 
 Preserve the project's existing env manager, lockfiles and Python environment path. Adapt the template to a different established venv path rather than introducing a second environment. Do not use `layout python` in a uv-managed project. Ensure `.env`, `.venv/` and `.direnv/` are ignored before loading private values; keep a secret-free `.envrc` trackable. Never copy real environment values into the template or Ai-Kit.
 
-Review `.envrc` and every executable file it sources before `direnv allow`; do not whitelist a parent directory or automatically trust scripts from a cloned repository. Verify with `direnv exec <project> <command>` using the project's actual interpreter/toolchain without printing environment values. Check the shell hook loads on entry and unloads on exit. Start or restart OMP from that activated project shell so its language servers inherit the same PATH and environment.
+Workspace tool selection follows [the shared mise procedure](../toolchain/references/workspace.md), without adding mise activation or `use mise` to `.envrc`. Keep existing direnv behavior intact; do not migrate its values or replace its runtime/venv ownership.
+
+Review `.envrc` and every executable file it sources before `direnv allow`; do not whitelist a parent directory or automatically trust scripts from a cloned repository. Verify with `direnv exec <project> <command>` using the project's actual interpreter/toolchain without printing environment values. Check the shell hook loads on entry and unloads on exit. Start or restart OMP from that activated project shell so its language servers inherit the same PATH and environment; when a workspace mise baseline was configured, launch with `mise exec -- omp` and use repository-native runners or repository-local mise execution for repository commands.
 
 ## Authoritative references
 

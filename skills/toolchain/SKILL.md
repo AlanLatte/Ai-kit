@@ -1,8 +1,14 @@
 ---
 name: toolchain
-description: "Configure OMP, memory, Backlog, Whiteboard, Git, direnv and language servers: projects location, then automatic/custom setup with free-form languages (Go and Python by default)."
+description: "Set up or report on an isolated workspace tool inventory, or configure machine-wide OMP, memory, Git, direnv and language servers through an interactive selector."
 ---
 # Environment setup selector
+
+## Select the requested scope first
+
+For an explicit workspace toolchain setup/check/report, including a project-kit delegation with a workspace root and declared tool inventory, follow [the workspace procedure](references/workspace.md) and stop after that flow. Install the ENTIRE caller-declared inventory on approved setup, not just current-task tools. This targeted flow does not run the machine-wide inventory, questionnaire or common installer below and does not authorize authentication, key/credential changes or services. Startup and report remain read-only; no automatic installation. Keep project inventories in their owning plugins.
+
+The remaining sections are the original machine-wide environment setup flow. Do not infer machine-wide approval from a workspace request.
 
 This is an agent-run setup flow, not an instruction sheet. Ask where projects belong, then offer "Реши все за меня" as the default with a free-form language field prefilled `go, python`. Execute the approved setup yourself, including dependencies and integrations. Reading the skill or displaying defaults is not installation approval. Do not resume a previously cancelled setup merely because the user requests changes to Ai-Kit itself.
 

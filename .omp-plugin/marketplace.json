@@ -7,7 +7,7 @@
     {
       "name": "ai-kit",
       "source": "./",
-      "version": "0.4.1",
+      "version": "0.4.2",
       "description": "Personal OMP tooling, Ponytail and optional Hindsight",
       "skills": [
         "./skills",
