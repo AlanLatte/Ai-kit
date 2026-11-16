@@ -5,7 +5,7 @@ description: "Use for Backlog.md task and document work: find existing work, cre
 
 # Backlog.md
 
-Apply `skill://no-ai-slop` silently to authored task titles, descriptions, comments, decisions, documents and final summaries. Reuse the available draft/context; preserve acceptance criteria, commitments, evidence, risks and the tracker's required language, metadata and format. Do not append an editing report or treat prose editing as permission to write or publish.
+Apply `skill://no-ai-slop` silently to authored task titles, descriptions, progress and status-transition notes, comments, decisions, documents and summaries. Reuse the available draft/context; preserve acceptance criteria, commitments, evidence, risks and the tracker's required language, metadata and format. Do not append an editing report or treat prose editing as permission to write or publish.
 
 ## Resolve the owning tracker first
 
@@ -33,7 +33,7 @@ Read `backlog <command> --help` for unfamiliar CLI operations, including documen
 ## Find and define work
 
 1. Search meaningful words and existing domain labels before creating anything. Inspect matching open records and their parents; reuse the appropriate task rather than duplicate it. Use focused filters and the native pagination hints instead of listing the whole tracker. Multiple label filters are AND.
-2. Capture the outcome, why it matters, beneficiary, confirmed context, scope, unknowns, and sources. Follow the project's title language and format. Do not turn an unresearched implementation idea into a requirement or create speculative follow-up work without authorization.
+2. Keep the description a short, stable account of the outcome, why it matters, and scope; aim for 1–3 sentences without dropping substantive requirements. Add only confirmed context, unknowns and sources needed to act; keep detailed AC, plans and progress in their native fields rather than repeating them. Follow the project's title language and required format. Do not turn an unresearched implementation idea into a requirement or create speculative follow-up work without authorization.
 3. Apply the project's required type, priority, due date, labels, initial status, and other metadata. Read those values from policy/config, not another project's defaults. Do not invent native defaults or treat a deadline as a priority. If a required decision is missing, ask for the missing decisions together before saving.
 4. Dates come from an agreed commitment or confirmed milestone, with calculation assumptions recorded. Never fabricate dates, silently roll overdue work forward, or put a child beyond its parent's deadline without resolving the conflict. Use only confirmed assignee identifiers or an explicitly agreed configured default; Git identity is not an assignee. Establish the executor before execution, not necessarily before initial recording.
 5. Split initiatives into independently verifiable deliverables, not daily/file/test chores. Use an existing parent ID and real prerequisite dependencies; identify each prerequisite's output. Avoid cycles, including a parent depending on its own children. Unresolved or ambiguous dependency IDs are not satisfied prerequisites.
@@ -46,6 +46,14 @@ Read the task, references, dependencies, blockers, and project policy before mut
 
 Keep the task as the requirements/plan/progress/evidence/acceptance record. Notes hold progress and verification; comments hold discussion and changes to decisions, priority, or commitments. Link the exact repository, relevant commits/MR and explanatory documents or Whiteboard. Do not store secrets or claim deployment/production acceptance from local source.
 
+### Record each status transition
+
+Before every actual status change, read the latest task and applicable policy; use the configured statuses. Append one concise delta to native notes: `<old status> -> <new status>: <what changed and observed result>; evidence: <exact reference>; next: <action/blocker or final disposition>`. Follow the project's required format if different. Cover starts, review/release handoffs, completion, reopening, blocking and cancellation where they change status. Record the reason for reopening or stopping; neither blockage nor cancellation is Done.
+
+Reference observed checks/results, commits, reviews or decisions precisely; if evidence is unavailable or a check was not run, say so rather than inventing it. Preserve earlier notes and meaningful progress between transitions. Summarize the new delta, not the whole task, chat transcript or raw logs; do not duplicate a transition or record a no-op as one. A genuine return to a prior status gets a new observed delta.
+
+When supported, submit status and appended notes in the same native edit: `backlog task edit <ID> --status "<new status>" --append-notes "<delta>"`. Otherwise use the supported native operations and report any partial result; do not claim atomicity. Inspect the returned task or read it back to confirm both status and retained notes. After an error or uncertain result, inspect the current record before retrying to avoid duplicate notes.
+
 Use the project's blocker representation with reason, unblocker, next action, and recheck date; remove it when resolved. Dependency-only `--ready` is not proof that review, blockers, access, or operational approvals permit work. Respect the project's work-in-progress limit and explicit ownership for parallel slices.
 
 Use the configured review/release states only with their documented evidence and approvals. Review readiness, reviewer approval, release readiness, publication, deployment, and final acceptance are different facts. If MCP rejects a configured custom status, use native `backlog task edit <ID> --status <configured-status>` from the owning tracker, not a substitute label or a direct record edit.
@@ -56,7 +64,7 @@ Include the project's required review material in the task and owner handoff. Wh
 
 Read finalization guidance and check every AC and applicable DoD against observed evidence. Record actual checks, results, scope, limitations, and genuine non-applicability. Do not check a box because code exists, a check was proposed, or an approval is expected; non-applicability cannot waive an explicit requirement. Complete required review, acceptance, and delivery before the configured final status. Close a parent only after its children and its own acceptance.
 
-Write the final summary and retain finished records until separately authorized archival. Cancellation, duplication, or blockage is not successful completion; preserve the reason and history instead of marking it Done or deleting it.
+Write the final summary as one short paragraph or at most three compact bullets: outcome, verification and remaining limitations. Link evidence already recorded rather than repeating the progression. Include the final status transition in notes and retain finished records until separately authorized archival. Cancellation, duplication, or blockage is not successful completion; preserve the reason and history instead of marking it Done or deleting it.
 
 ## Access and storage boundaries
 
