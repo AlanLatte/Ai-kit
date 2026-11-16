@@ -3,7 +3,7 @@
   "version": "0.4.7",
   "private": true,
   "type": "module",
-  "description": "Personal native OMP tooling without project policies",
+  "description": "User-scoped shared skills, tools and environment setup",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=22"

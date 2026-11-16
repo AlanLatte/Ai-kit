@@ -60,7 +60,7 @@ The native mode form can use this shape:
 
 ```html
 <form>
-<p>The agent installs missing tools and dependencies, configures integrations, direnv, LSP for the entered languages, the native OMP status line and tokens/sec display, and starts necessary local services. Existing settings, data and keys are preserved; a different custom bar requires agreement before replacement. .envrc is created during individual project setup.</p>
+<p>Агент установит недостающие инструменты и зависимости, подключит интеграции, direnv и LSP для указанных языков, настроит native статус-бар OMP и показ tokens/sec и запустит нужные локальные сервисы. Рабочие настройки, данные и ключи сохраняются; отличающийся пользовательский бар не заменяется без согласования. .envrc создается при настройке конкретного проекта.</p>
 <fieldset>
 <legend>Как настроить окружение?</legend>
 <label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP, память, Backlog, Whiteboard, Git/ghq/GCM, подписи, direnv, LSP и общие инструменты</label>
