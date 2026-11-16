@@ -6,11 +6,8 @@ description: "Set up or report on an isolated workspace tool inventory, or confi
 
 Apply `skill://no-ai-slop` silently to authored questions, setup explanations, readiness reports and documentation using the context already available. Preserve form fields, commands, exact evidence, limitations and the required language/output structure; do not add an editing report or turn a prose pass into installation or publication approval.
 
-Keep Ai-Kit project-neutral. Working-project names, domains, hosts, paths,
-inventories and special routing rules belong in owning project kits or local
-configuration, not in Ai-Kit skills, examples, fixtures, documentation or plans.
-Accept the workspace root and inventory as invocation inputs; do not hardcode
-them, persist them into this package or branch shared setup by a project name.
+Ai-Kit is a user-scoped package of shared tools and environment procedures.
+Workspace roots and tool inventories are supplied by the caller.
 
 ## Select the requested scope first
 
