@@ -2,6 +2,11 @@
 
 ## OMP installation and profile
 
+These model/shape/bridge contracts require OMP 18.20.2. Inspect installed
+help/schema before setup; older historical smoke results do not prove these
+APIs. Report unsupported capabilities rather than silently omitting them or
+upgrading the user's client without approval.
+
 Reuse an existing working `omp`. Compiled OMP does not need external Bun. On macOS the official Homebrew route is:
 
 ```sh
@@ -12,11 +17,16 @@ The official macOS/Linux binary alternative is `curl -fsSL https://omp.sh/instal
 
 Resolve the effective current profile and workspace before any write; do not ask the user to choose a profile in normal recommended setup. Use a different profile only when explicitly requested or to resolve a real conflict. Inspect `omp config path`, or `omp --profile <name> config path` for an explicitly selected profile, and relevant `config get <key> --json` and project settings. `config path` returns the agent directory, not a configuration file. Environment overrides such as `PI_CONFIG_DIR`, `PI_CODING_AGENT_DIR` and `OMP_PROFILE` affect discovery. Verify their effective result; never clear them or move the default profile silently.
 
-Use `omp --profile <name> config set <key> <value>` only for approved settings in that profile. `--scope` on `omp config` is a list filter, not a project-write flag: do not invent `config set --scope project`. For project-only changes edit the resolved `.omp/config.yml` selectively, preserving every unrelated YAML key. Do not write invented model roles/provider auth, use `--alias`, change shell wrappers, or initialize a new profile over an existing one.
+Use `omp --profile <name> config set <key> <value>` only for approved settings in that profile. `--scope` on `omp config` is a list filter, not a project-write flag: do not invent `config set --scope project`. For project-only changes edit the resolved `.omp/config.yml` selectively, preserving every unrelated YAML key. Do not invent roles/provider auth, use `--alias`, change shell wrappers, or initialize a new profile over an existing one.
 
 If authentication is actually missing, use the client's native login UI for the chosen provider. Let the user complete browser/device authentication privately. Do not obtain credentials from another client's database or claim that a provider login was checked just from `omp --version`. A user who selected installation but supplied no model/provider choice can have a verified installed CLI with login reported as pending, not an invented working account.
 
 After changes launch a fresh native process for the selected profile, inspect state and available commands without a model turn, and verify the intended settings layer. Do not send a paid/model request as a generic setup test.
+
+Approved OMP setup also follows [native model discovery, roles and bounded
+handoff](models.md). Preserve the user's ordinary-chat default and existing
+assignments; explicit `@plan` authorship and `@slow` review do not require an
+expensive default reset. No inference/benchmark is a setup readiness check.
 
 ## Native token rate
 
@@ -68,7 +78,8 @@ model/path/git options into the existing record, retaining other segment entries
 and option keys. Preserve every setting outside this preset, including theme,
 other composer options, models, credentials and unrelated footer settings.
 
-This complete preset is verified with OMP 18.19.0. Do not silently drop unsupported
+This preset's older checks do not establish current extension API support.
+Require the capability checks above; do not silently drop unsupported
 settings or segments on older versions; report the compatibility conflict before
 changing the profile. After applying it, compare every owned value through native
 `config get <key> --json` and launch a fresh native TUI without sending a model
@@ -77,7 +88,7 @@ rendering. Native conditional segments remain hidden when there is nothing to sh
 cost before usage, PR outside a pull request, or session name before naming.
 Repeating setup against matching values must not rewrite configuration.
 
-Verify the input panel in a fresh TUI on OMP 18.19.0 with Codex selected and the
+Verify the input panel in a fresh TUI on OMP 18.20.2 with Codex selected and the
 editor idle: it shows account usage percent, reset countdown and a Monday-first
 calendar highlighting today when a weekly reset is available. Multiple windows
 are labeled separately. Data comes from the active native Codex account through

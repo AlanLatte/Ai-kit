@@ -77,14 +77,26 @@ the user's native settings determine whether memory is active and its scope.
 Configure those defaults deliberately rather than pointing them at a project's
 bank unintentionally.
 
-## Data and personal preferences
+## Durable-memory charter
 
-Existing separate banks and their data stay in place. Reuse their existing bank
-IDs in local routes; this feature neither reads, copies, exports, merges nor
-erases stored memories. Stable personal preferences belong in the user's existing
-global personal instructions, not in a project bank used as a cross-project
-fallback. This preparation does not edit those instructions or reduce recall
-limits.
+Hindsight is the global durable-knowledge facility: retain stable preferences,
+reusable decisions, lessons and facts only in explicitly authorized banks.
+Global availability does not mean a single shared bank or cross-project access.
+Startup instructions hold current operating rules, not a compulsory duplicate
+of every preference. Existing banks, IDs, credentials and native configuration
+stay private and unchanged; no migration, export, merge or recall-limit reduction
+is part of setup.
+
+Backlog is the sole requirements, plan, progress, status-history and evidence
+index for current tasks. Its documents hold product/task artifacts, not generic
+tool installation manuals. Link a Backlog ID when a durable lesson needs its
+source; do not mirror the task lifecycle into memory. Ripwire supplies current
+source structure and code search; old memory is not evidence of current code.
+
+Use only an explicitly authorized personal/shared bank for cross-project
+preferences. A project bank is not a fallback for unrelated work. The router's
+`scoping=global` shares its selected bank across that routed workspace; it does
+not grant permissions, select a universal personal bank or flatten access scopes.
 
 ## Local CPU inference and refresh recovery
 

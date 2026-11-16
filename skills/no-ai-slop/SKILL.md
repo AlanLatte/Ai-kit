@@ -1,6 +1,6 @@
 ---
 name: no-ai-slop
-description: "Edit or detect AI-slop patterns in human prose; also apply silently to all assistant-authored text, commits, PR/MR material, releases, incidents, reports, worklogs and documentation while preserving facts and engineering contracts."
+description: Edit or detect patterns in human prose; silently refine authored text without changing evidence or format.
 license: MIT
 ---
 
@@ -14,7 +14,7 @@ For an explicit request to edit a supplied draft, preserve upstream behavior: ma
 
 ## Embedded prose pass
 
-Apply the editing principles silently to all human prose you author: ordinary replies; commit subjects and bodies; PR/MR titles, descriptions, comments and reviews; release and hotfix notes; incident updates; reports, worklogs, task records and documentation. Include prose produced by native subagents and prose inside tool arguments or files, not only the final reply. Use the draft, evidence and audience already available; do not ask the user to paste the same text or announce an editing stage.
+Apply the editing principles silently to all human prose you author: ordinary replies; commit subjects and bodies; PR/MR titles, descriptions, comments and reviews; release/hotfix notes and tag annotations; incident updates; reports, worklogs, task records and documentation. Include prose produced by native subagents and prose inside tool arguments or files, not only the final reply. Use the draft, evidence and audience already available; do not ask the user to paste the same text or announce an editing stage.
 
 Before sending or saving, make the minimum effective prose edit and self-check in the same reasoning pass. Keep the workflow's exact output contract: no appended **What changed**, pattern report, pass/fail checklist or extra section in a commit, report, structured response or ordinary reply. An explicit standalone request above is the exception. No mandatory second agent, extra model/network call or automatic output postprocessing is needed.
 
