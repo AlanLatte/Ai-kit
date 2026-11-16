@@ -1,5 +1,6 @@
 import { execFile } from "node:child_process";
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { isIP } from "node:net";
 import { homedir } from "node:os";
 import { join, resolve } from "node:path";
 import { setTimeout } from "node:timers/promises";
@@ -43,7 +44,7 @@ function endpoint(apiUrl, token) {
   if (!["http:", "https:"].includes(url.protocol) || url.username || url.password || url.search || url.hash) {
     throw new Error("Hindsight endpoint must be an HTTP(S) URL without credentials, query or fragment; use HINDSIGHT_API_TOKEN for authentication.");
   }
-  const loopback = ["localhost", "[::1]"].includes(url.hostname) || /^127\./.test(url.hostname);
+  const loopback = ["localhost", "[::1]"].includes(url.hostname) || (isIP(url.hostname) === 4 && url.hostname.startsWith("127."));
   if (token && url.protocol === "http:" && !loopback && process.env.HINDSIGHT_PROTECTED_HTTP_ORIGIN !== url.origin) {
     throw new Error("Hindsight authenticated remote endpoints require HTTPS. For an explicitly approved encrypted tunnel or protected transport, set HINDSIGHT_PROTECTED_HTTP_ORIGIN to that exact HTTP origin; redirects remain forbidden.");
   }

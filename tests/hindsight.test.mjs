@@ -324,3 +324,26 @@ globalThis.fetch = async (url, options) => {
   assert.equal(accepted.code, 0, accepted.stderr);
   assert.ok(f.calls().every(call => call.binary === "omp" && call.args[1] === "get"));
 });
+
+test("127-prefixed DNS names are rejected before fetch while actual 127/8 IPv4 stays local", async (t) => {
+  for (const hostname of ["127.attacker.example", "127.23.45.67"]) {
+    const f = fixture(t, { "hindsight.apiUrl": `http://${hostname}:8888` });
+    const marker = join(f.root, "fetch-called");
+    const probe = join(f.root, "loopback.mjs");
+    writeFileSync(probe, `import {writeFileSync} from "node:fs";
+globalThis.fetch = async (url) => {
+  writeFileSync(process.env.TEST_FETCH_MARKER, url);
+  return {ok:true,json:async()=>url.endsWith("/health")?{status:"healthy",database:"connected"}:{banks:[]}};
+};
+`);
+    const result = await f.run("report", { TEST_FETCH_MARKER: marker }, probe);
+    if (hostname === "127.attacker.example") {
+      assert.equal(result.code, 1);
+      assert.match(result.stderr, /require HTTPS/);
+      assert.equal(existsSync(marker), false);
+    } else {
+      assert.equal(result.code, 0, result.stderr);
+      assert.match(readFileSync(marker, "utf8"), /^http:\/\/127\.23\.45\.67:8888\//);
+    }
+  }
+});
