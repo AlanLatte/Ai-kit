@@ -14,7 +14,7 @@ When called by `toolchain` for recommended environment setup, reuse its approved
 
 ## 1. Discover before changing
 
-A development root contains workspaces; a workspace contains independent repository checkouts. Do not turn the workspace into a Git repository or scaffold an application without a separate requirement.
+A workspace is the existing root of related independent repository checkouts and shared configuration, often its own `.gitconfig`, tracker and client/environment settings. Its parent development directory is only a location for workspaces. Use the root the user supplies or existing configuration establishes; do not insert a new directory layer, initialize the workspace as a Git repository or invent another profile.
 
 Inspect the OS, shell, installed `git`, `ghq` and `git credential-manager --version`, existing `ghq root --all`, `GHQ_ROOT`, conditional Git includes and relevant workspace `.gitconfig`/`.config`. In an existing checkout use `git rev-parse --show-toplevel --git-dir --git-common-dir` and `git remote -v`. Inspect configuration sources with `git config --show-origin --get <key>`; do not dump credentials or helper commands containing secrets.
 
@@ -114,13 +114,30 @@ Signing acceptance requires the same fingerprint and a successful cryptographica
 
 ## 7. Configure the project environment
 
-Project setup includes direnv installation, its shell hook and a repository-root `.envrc`; follow [the environment procedure](../toolchain/references/direnv.md). Reuse an existing `.envrc` without replacing it. For a missing file copy [templates/envrc](templates/envrc), then add only environment requirements established by the actual project. The template loads an optional private `.env` and activates an existing `.venv`, without creating a virtual environment, installing dependencies or pinning a runtime.
+For an explicit workspace setup, configure its existing root environment; do not
+create a new wrapper directory or rewrite every child checkout. For a separately
+requested repository setup, target that repository while preserving its reviewed
+parent-workspace loading. Reuse [the direnv procedure](../toolchain/references/direnv.md)
+and [shared workspace toolchain procedure](../toolchain/references/workspace.md).
+Ai-Kit owns mise bootstrap and activation; the project kit owns inventory and
+compatibility, the workspace owns pins/locks/`.envrc`, and repositories retain
+their native lockfiles, venv paths, Bundler and other dependency runners.
 
-Preserve the project's existing env manager, lockfiles and Python environment path. Adapt the template to a different established venv path rather than introducing a second environment. Do not use `layout python` in a uv-managed project. Ensure `.env`, `.venv/` and `.direnv/` are ignored before loading private values; keep a secret-free `.envrc` trackable. Never copy real environment values into the template or Ai-Kit.
+Inspect an existing `.envrc` and sourced code before changing or allowing it.
+Preserve its secret loading, policy wrappers and mise dependency. Merge only
+missing approved behavior. The [environment template](templates/envrc) supplies
+optional private `.env` and existing `.venv` handling; it does not select mise
+versions, load an arbitrary ancestor, create environments or install dependencies.
+When a new child `.envrc` would hide its workspace environment, review the exact
+parent first and merge its established loading before child-native overrides.
+Do not introduce a second venv or `layout python` for uv projects.
 
-Workspace tool selection follows [the shared mise procedure](../toolchain/references/workspace.md), without adding mise activation or `use mise` to `.envrc`. Keep existing direnv behavior intact; do not migrate its values or replace its runtime/venv ownership.
-
-Review `.envrc` and every executable file it sources before `direnv allow`; do not whitelist a parent directory or automatically trust scripts from a cloned repository. Verify with `direnv exec <project> <command>` using the project's actual interpreter/toolchain without printing environment values. Check the shell hook loads on entry and unloads on exit. Start or restart OMP from that activated project shell so its language servers inherit the same PATH and environment; when a workspace mise baseline was configured, launch with `mise exec -- omp` and use repository-native runners or repository-local mise execution for repository commands.
+Complete the one-direnv-loader activation and fresh-shell proofs from the shared
+procedure. `.venv/bin` and policy wrappers must win over baseline tools. Keep
+`.env`, `.venv/` and `.direnv/` ignored and `.envrc` secret-free. Never print private
+environment values, broadly trust parent directories, install on entry or
+silently re-allow modified clones. Normal use after setup is `cd` then `omp`;
+explicit `mise exec` remains the documented automation fallback.
 
 ## Authoritative references
 

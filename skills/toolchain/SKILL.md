@@ -10,6 +10,16 @@ Apply `skill://no-ai-slop` silently to authored questions, setup explanations, r
 
 For an explicit workspace toolchain setup/check/report, including a project-kit delegation with a workspace root and declared tool inventory, follow [the workspace procedure](references/workspace.md) and stop after that flow. Install the ENTIRE caller-declared inventory on approved setup, not just current-task tools. This targeted flow does not run the machine-wide inventory, questionnaire or common installer below and does not authorize authentication, key/credential changes or services. Startup and report remain read-only; no automatic installation. Keep project inventories in their owning plugins.
 
+A workspace is the existing root of related independent repositories and shared
+configuration, often including its own `.gitconfig`, tracker and client settings.
+Reuse the supplied root; do not create another directory layer, Git repository
+or profile. Ai-Kit owns the shared external mise setup and direnv activation;
+the owning project kit supplies the complete inventory and constraints. The
+workspace owns its `mise.toml`, lock and `.envrc`; repositories retain native
+locks/runners and may refine versions. A user-local cache does not imply global
+tool selection. Do not remove an existing mise-dependent `.envrc` because other
+dependency managers happen to be present.
+
 The remaining sections are the original machine-wide environment setup flow. Do not infer machine-wide approval from a workspace request.
 
 This is an agent-run setup flow, not an instruction sheet. Ask where projects belong, then offer "Реши все за меня" as the default with a free-form language field prefilled `go, python`. Execute the approved setup yourself, including dependencies and integrations. Reading the skill or displaying defaults is not installation approval. Do not resume a previously cancelled setup merely because the user requests changes to Ai-Kit itself.
