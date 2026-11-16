@@ -52,7 +52,7 @@ globalThis.fetch=async(url)=>{if(!existsSync(process.env.TEST_MARKER))throw new 
     async run(mode, overrides = {}, lifecycle = false) {
       const options = { cwd: root, encoding: "utf8", timeout: 12000, env: { ...env, PATH: `${bin}${delimiter}${process.env.PATH}`, HOME: root, XDG_CONFIG_HOME: join(root, "config"), AI_KIT_CLIENT: "omp", TEST_CONFIG: config, TEST_CALLS: calls, TEST_MARKER: marker, ...overrides } };
       try {
-        const result = await execute(process.execPath, [...(lifecycle ? ["--import", preload] : []), script, mode], options);
+        const result = await execute(process.execPath, [...(lifecycle ? ["--import", typeof lifecycle === "string" ? lifecycle : preload] : []), script, mode], options);
         return { ...result, code: 0 };
       } catch (error) {
         return { stdout: error.stdout, stderr: error.stderr, code: error.code };
@@ -300,4 +300,27 @@ test("an existing Compose runtime supplies its own credentials without a kit llm
   assert.equal(result.code, 0, result.stderr);
   assert.equal(existsSync(join(f.directory, "llm.env")), false);
   assert.equal(readFileSync(compose, "utf8"), "custom runtime with another credential source\n");
+});
+
+test("authenticated remote HTTP requires an exact approved protected origin before any request", async (t) => {
+  const f = fixture(t, { "hindsight.apiUrl": "http://memory.example:8888/api" });
+  writeFileSync(f.marker, "ready");
+  const probe = join(f.root, "transport.mjs");
+  writeFileSync(probe, `import assert from "node:assert/strict";
+globalThis.fetch = async (url, options) => {
+  assert.equal(new URL(url).origin, "http://memory.example:8888");
+  assert.equal(options.headers.Authorization, "Bearer config-secret");
+  assert.equal(options.redirect, "error");
+  return {ok:true,json:async()=>url.endsWith("/health")?{status:"healthy",database:"connected"}:{banks:[]}};
+};
+`);
+  for (const origin of [undefined, "*", "http://memory.example", "http://memory.example:8889", "http://memory.example:8888/api", "http://other.example:8888"]) {
+    const result = await f.run("report", { HINDSIGHT_PROTECTED_HTTP_ORIGIN: origin }, probe);
+    assert.equal(result.code, 1);
+    assert.match(result.stderr, /require HTTPS/);
+    assert.doesNotMatch(result.stderr, /config-secret/);
+  }
+  const accepted = await f.run("report", { HINDSIGHT_PROTECTED_HTTP_ORIGIN: "http://memory.example:8888" }, probe);
+  assert.equal(accepted.code, 0, accepted.stderr);
+  assert.ok(f.calls().every(call => call.binary === "omp" && call.args[1] === "get"));
 });

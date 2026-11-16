@@ -82,7 +82,10 @@ editor idle: it shows account usage percent, reset countdown and a Monday-first
 calendar highlighting today when a weekly reset is available. Multiple windows
 are labeled separately. Data comes from the active native Codex account through
 the usage API, not a model request; no credentials are bundled or copied.
-Refresh runs at startup, every minute, after turns and session switches.
+Refresh runs only while `composer.shape=ai-kit.input-panel`: on selection/startup,
+every minute, after turns and session switches. Deselecting stops polling and
+restores the previous editor factory only if Ai-Kit still owns it. Placeholder
+suppression is temporary during selected-shape rendering, not a deletion.
 Missing usage displays `Usage unavailable`; other providers, active generation,
 long/multiline input and narrow space suppress the hint without hiding input.
 The frame's short trailing meter reflects the highest reported usage fraction.
