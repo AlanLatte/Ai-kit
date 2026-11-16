@@ -7,11 +7,14 @@
     {
       "name": "ai-kit",
       "source": "./",
-      "version": "0.4.7",
+      "version": "0.5.0",
       "description": "Personal OMP tooling, Ponytail and optional Hindsight",
       "skills": [
         "./skills",
-        "./vendor/ponytail/skills"
+        "./vendor/ponytail/skills/ponytail",
+        "./vendor/ponytail/skills/ponytail-review",
+        "./vendor/ponytail/skills/ponytail-audit",
+        "./vendor/ponytail/skills/ponytail-debt"
       ]
     }
   ]

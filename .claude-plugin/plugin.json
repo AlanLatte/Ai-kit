@@ -1,6 +1,6 @@
 {
   "name": "ai-kit",
-  "version": "0.4.7",
+  "version": "0.5.0",
   "description": "User-scoped shared skills, tools and environment setup",
   "author": {
     "name": "AlanLatte"
@@ -8,6 +8,9 @@
   "license": "UNLICENSED",
   "skills": [
     "./skills",
-    "./vendor/ponytail/skills"
+    "./vendor/ponytail/skills/ponytail",
+    "./vendor/ponytail/skills/ponytail-review",
+    "./vendor/ponytail/skills/ponytail-audit",
+    "./vendor/ponytail/skills/ponytail-debt"
   ]
 }

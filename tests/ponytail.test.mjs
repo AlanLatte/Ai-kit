@@ -76,6 +76,9 @@ test("ordinary turns carry only a bounded skill reference; standalone deactivati
   const instructions = await current.instructions();
   assert.match(instructions, /skill:\/\/ponytail\b/);
   assert.ok(Buffer.byteLength(instructions) <= 512);
+  assert.match(instructions, /Assignment verification ownership, existing test frameworks/);
+  assert.match(instructions, /global\/project comment rules/);
+  assert.match(instructions, /Complete the full requested scope/);
   await current.input("add a normal mode toggle");
   assert.match(await current.instructions(), /skill:\/\/ponytail\b/);
   await current.input("normal mode");

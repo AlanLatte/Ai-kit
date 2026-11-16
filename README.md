@@ -13,6 +13,7 @@
 | Чат OMP | `/skill:project-setup` | Создать или подключить проект, настроить Git и .envrc |
 | Чат OMP | `/skill:backlog` | Работать с задачами выбранного проекта |
 | Чат OMP | `/skill:no-ai-slop` | Отредактировать черновик или назвать найденные речевые шаблоны без переписывания |
+| Чат OMP | `/skill:security-review` | Проверить конкретную границу безопасности или выполнить явно запрошенный полный аудит |
 
 Команды `/skill:...` вводятся внутри OMP, не в shell. Клонировать Ai-Kit или заходить в его каталог для запуска мастера не нужно.
 
@@ -28,19 +29,20 @@ Workspace здесь - существующий корень группы нез
 
 ## Состав
 
-- Ponytail 4.12.0: один native runtime; полный текст читается через skill только для кода, режим сохраняется. Пять вспомогательных skills доступны явными командами, но скрыты из стартового каталога через native `hide`.
+- Ponytail 4.12.0: один native runtime; полный текст читается только для кода. Ownership проверок, существующие test frameworks, global/project comment policy и полный порученный scope важнее upstream примеров. Пять вспомогательных skills скрыты из каталога, но доступны явно; help/gain - first-party OMP wrappers без изменения pinned vendor.
 - `no-ai-slop`: общий skill для человеческого текста и короткий native prompt pointer на каждом ходе, в том числе у native subagents. Полные правила читаются по требованию, текст ответа не перехватывается.
-- `toolchain`: целевая установка полного workspace inventory через native mise либо интерактивный селектор общих инструментов и интеграций компьютера.
+- `toolchain`: короткий router целевой workspace-установки либо machine setup; native OMP-роли и локальные/удаленные bridges читаются только для выбранной настройки.
 - Hindsight helper: read-only readiness и явная настройка локального сервиса без замены существующего runtime.
 - `backlog`: короткое описание задачи и история изменений при каждом переходе статуса с результатом, подтверждением и следующим шагом; настройки и формат задает политика трекера.
 - `project-setup`: создание workspace/репозитория, `ghq`, GCM и раздельные Git-профили; существующий ключ подписи в `.ssh`, локальные скрипты в `.config`, отдельный OpenSSH-agent и Keychain без зависимости от Bitwarden при коммитах. Подробности читаются только при вызове навыка; реальные настройки и ключи не входят в пакет.
 - Необязательная маршрутизация существующих банков памяти по локальной конфигурации: [docs/memory.md](docs/memory.md). Без конфигурации router ничего не меняет.
+- `security-review`: единый общий source-first engine с коротким mode router, отдельным safety/evidence core и demand-loaded companions. Project wrappers сохраняют inventory, доступы и delivery. Запрос отчета не расширяет scope; полный security request запускает полный workflow. Quick/scoped pass не требует четырех recon-агентов или фиксированного critic floor; независимая проверка подтвержденных findings обязательна. [Процедура](skills/security-review/SKILL.md).
 
 Проверки инструментов запускаются по задаче через skill, а не безусловно на каждом старте. Модели, ключи, endpoint, настройки UI и проектные привязки остаются локальными. Установка пакета не устанавливает системные программы, не запускает Docker и не включает память.
 
 ## Совместимость и установка
 
-Требования: Node.js 22+ для helpers, OMP 18.18.6 и 18.18.8 проверены. Компилированному OMP внешний Bun не нужен. Нативная установка без launcher, shell wrapper, `npm link` и генерации проектных инструкций.
+Требования: Node.js 22+ для helpers, OMP 18.20.2 для текущих model/shape/bridge API. Старые проверки 18.18.6/18.18.8 ниже - исторические, не сертификация новых API. Setup проверяет установленный help/schema, явно сообщает несовместимость и не обновляет клиент без разрешения. Нативная установка без launcher, shell wrapper, `npm link` и генерации проектных инструкций.
 
 Локальный marketplace из корня checkout:
 
@@ -108,13 +110,15 @@ Bearer-аутентификация удаленного Hindsight требуе�
 
 Общий inventory не включает Git-host/deploy зависимости конкретных продуктов. Их проверяют проектные пакеты.
 
-Версия 0.4.2 добавляет общий workspace flow без изменения macOS common installer: полная установка переданного inventory, точные локальные pins/locks, сохранение direnv и отдельная проверка binary scope и workflow readiness.
+### Модели и ограниченная передача задач
 
-Версия 0.4.3 добавляет `no-ai-slop` для всего авторского текста: обычных ответов, коммитов, PR/MR, релизов, hotfix/incident-заметок, отчетов, worklogs, задач и документации.
+Выбранная настройка OMP включает [полную native-процедуру](skills/toolchain/references/models.md): catalog metadata плюс enabled/available session set через RPC `get_available_models`, сохранение существующих roles и обычного `default`, локальные `@plan` для сильного планирования/research/task artifacts, `@task`/`@smol` для доказанно способного исполнителя и `@slow` для сильного reviewer. Шаблоны native agents устанавливаются локально; конкретные model IDs/provider defaults не распространяются. Unknown price остается unknown; более дешевый capable executor выбирается только по данным. Auth fallback к parent и разрешенные fallback chains не дают hard cost cap. Setup не делает inference/paid benchmark и не включает always-judge, eager/always, autoParallel или automatic prewalk.
 
-Версия 0.4.4 уточняет существующий workspace-root и общую ответственность Ai-Kit за mise/direnv: автоматический вход и выход, сохранение репозиторных окружений и отдельных версий соседних workspace. Пользовательская установка инструментов не устраняет возможную потребность в системном компиляторе, make и библиотеках; блокировки native runner отражаются отдельно от полного baseline inventory.
+Передача содержит owning Backlog task/root, AC, план, артефакт, границы и владельца проверки. Backlog - единственный индекс требований, плана, прогресса и evidence; его docs - продуктовые/task artifacts. Hindsight хранит разрешенные durable knowledge/preferences/lessons без копии task lifecycle, Ripwire - текущий код. Явно назначенное review нельзя молча отменить; tiny-change fast path требует согласованного решения.
 
-Версия 0.4.5 включает `.config` в общие skills `project-setup` и `toolchain`: единый layout, сохранение существующих wrappers/identities, явная миграция всех потребителей и проверка Git origins/PATH без изменения credential stores или служб.
+### Локальные и удаленные bridges
+
+[Общая процедура](skills/toolchain/references/bridges.md) настраивает native browser relay, точный loopback OAuth callback-туннель, scoped SSH-agent socket и направления clipboard через платформенные OpenSSH/terminal возможности. `omp ssh` управляет native host configurations, а не превращает произвольный SSH/tssh launcher в готовый bridge. Рабочие wrappers остаются; приватные ключи не копируются, host trust, доступ к tabs и clipboard directions согласуются. OSC 52 copy, обычный paste и OSC 5522 image paste имеют разные ограничения; без image-paste capability используется явно разрешенная передача выбранного файла в private scratch, не фиктивный remote clipboard.
 
 ### Работа с текстом
 
@@ -128,12 +132,15 @@ Bearer-аутентификация удаленного Hindsight требуе�
 
 ```sh
 npm test
+node --test skills/security-review/vendor/*.test.cjs
 shellcheck scripts/toolchain.sh
 ```
 
 Node-проверки helpers используют одноразовые каталоги, fake CLI и loopback HTTP; Docker и внешние сервисы не нужны. Проверены read-only диагностика, выборочная установка и границы отказов, сохранение другого backend и настроек, credentials/redirect границы, повторная установка и отсутствие пересоздания существующего runtime.
 
 Нативные проверки: установка на OMP 18.18.6; на OMP 18.18.8 - отдельный профиль и проектный слой Hindsight без изменения остальных профилей, stdio и HTTP MCP с env-ссылкой на токен. Backlog.md 1.55.3 возвращает workflow выбранного одноразового трекера; Whiteboard 0.5.2 из Desktop bundle запускает изолированный headless backend и отвечает на backend-backed MCP capabilities без системного Node. Установки системных пакетов через Homebrew/npm в этих проверках не выполнялись. Режимы Ponytail и маршрутизация памяти проверены отдельно; границы live-проверки памяти описаны в `docs/memory.md`.
+
+Проверки 0.5.0 на native OMP 18.20.2 выполнялись в disposable HOME/profile с dummy credentials и loopback-only fixture provider, без inference. Проверены native role writes/readback, enabledModels-filtered RPC discovery, локальные agent definitions, effective first-party help/gain paths, marketplace install и TUI selected input shape с видимым `Usage unavailable` и восстановлением placeholder. Это не проверка live Codex usage, tokens/sec во время генерации, качества моделей или фактической цены аккаунта. Для bridges проверены source/help contracts, native host registration/list и запись relay extension; реальные browser tabs, callback login, remote agent и clipboard требуют разрешенного окружения и отдельно описанной readiness.
 
 ## Происхождение и лицензии
 
@@ -142,3 +149,5 @@ Node-проверки helpers используют одноразовые кат
 Ponytail: MIT, Dietrich Gebert. Версия 4.12.0, upstream `https://github.com/DietrichGebert/ponytail.git`, commit `e15862bb04d04285233a164460ced063941d9ef5`. Сохранены `vendor/ponytail/LICENSE` и `UPSTREAM`. Поставляется необходимый runtime/skills subset без benchmarks. Локальные изменения: native extension принимает builder инструкций вторым необязательным аргументом; Ai-Kit передает короткий указатель вместо полного текста. Metadata основного skill сокращена, вспомогательные skills помечены `hide: true`. Команды, режимы и persistence upstream сохранены.
 
 No AI slop: MIT, Peter Yang, upstream `https://github.com/petergyang/no-ai-slop`, commit `000650b156983f5159695b441477f4e63b25dc85`. `vendor/no-ai-slop/SKILL.md`, `eval.md` и `LICENSE` сохранены без изменений; source paths и Git blob IDs закреплены в `vendor/no-ai-slop/UPSTREAM`. Scripts, agents и plugin runtime upstream не поставляются. Локальный MIT-wrapper в `skills/no-ai-slop/SKILL.md` сохраняет standalone edit/detect и задает тихий embedded-проход с инженерными ограничениями.
+
+Security review: MIT, Cloudflare; upstream `https://github.com/cloudflare/security-audit-skill`, commit `c1c8a8c1471069fb0e188eeaff69b8e8db6564a8`. Сохранены `skills/security-review/vendor/LICENSE`, `UPSTREAM`, schema и оба validators с тестами. Общий engine перенесен из прежней vendored/adapted копии; Ai-Kit адаптирует routing, progressive disclosure и пропорциональное делегирование, сохраняя sandbox, source evidence, независимую проверку findings и честные coverage limits.
