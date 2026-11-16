@@ -1,9 +1,9 @@
 {
   "name": "ai-kit",
-  "version": "0.4.1",
+  "version": "0.5.0",
   "private": true,
   "type": "module",
-  "description": "Personal native OMP tooling without project policies",
+  "description": "User-scoped shared skills, tools and environment setup",
   "license": "UNLICENSED",
   "engines": {
     "node": ">=22"
@@ -12,6 +12,7 @@
     "extensions": [
       "./omp/ponytail.mjs",
       "./omp/memory.mjs",
+      "./omp/no-ai-slop.mjs",
       "./omp/input-panel.ts"
     ]
   },

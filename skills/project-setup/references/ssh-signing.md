@@ -42,7 +42,7 @@ Use `plutil -lint <plist>` before `launchctl bootstrap gui/<uid> <plist>`. Check
 
 ## Put only the launcher and include in workspace .config
 
-Create a local `<workspace>/.config/git-sign.sh` from this template, substituting the approved key profile. It must be executable and user-owned. Do not execute it with literal unresolved template values. The public identity configured in Git remains unchanged.
+Create a local `<workspace>/.config/bin/git-sign` from this template under the [shared layout](workspace-layout.md), substituting the approved key profile. It must be executable and user-owned. For an existing launcher, discover and preserve its callers; path migration is separate from key enrollment. Do not execute unresolved template values or change the public identity.
 
 ```bash
 #!/bin/bash
@@ -62,7 +62,7 @@ The wrapper changes the socket only for its own signing process. It forwards ver
 
 For the initial Keychain import, use the user's own terminal with the dedicated socket and native `/usr/bin/ssh-add --apple-use-keychain <key>`. The user enters the passphrase through OpenSSH/OS interaction; the command loads the key and stores its passphrase in Keychain. Validate `/usr/bin/ssh-add -T <public-key>` there. Do not use a different SSH distribution's incompatible Keychain options or inspect Keychain secrets. If Keychain is locked, the user unlocks it through macOS.
 
-Create a private `signing.gitconfig` in the workspace `.config`, setting only `gpg.ssh.program` to the absolute launcher path. After successful proof, add an idempotent include from the workspace `.gitconfig` to that file. Preserve the author identity, the same `user.signingKey`, `gpg.format=ssh`, existing required commit/tag signing and hooks. Do not activate a half-tested include, clear global helpers or reconfigure other profiles.
+Create private `<workspace>/.config/git/signing.gitconfig`, setting only `gpg.ssh.program` to the absolute launcher path. After successful proof, add an idempotent include from the canonical `<workspace>/.config/git/config`, resolving relative includes from that file's directory. Preserve author, the same `user.signingKey`, SSH format, required signing and hooks. Do not leave duplicate old profile writers, activate a half-tested include, clear global helpers or reconfigure other profiles.
 
 ## Prove behavior, then activate
 

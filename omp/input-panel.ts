@@ -1,6 +1,11 @@
 import { CustomEditor, type ExtensionAPI, type ExtensionContext } from "@oh-my-pi/pi-coding-agent";
+import { findScopedSettings } from "@oh-my-pi/pi-coding-agent/config/settings";
+import { cfgComposerShape } from "@oh-my-pi/pi-coding-agent/modes/settings";
 import type { UsageReport } from "@oh-my-pi/pi-ai";
-import { boxComposerStyle, visibleWidth } from "@oh-my-pi/pi-tui";
+import { boxComposerStyle, visibleWidth, type EditorTheme, type TUI } from "@oh-my-pi/pi-tui";
+import type { KeybindingsManager } from "@oh-my-pi/pi-tui/app-keybindings";
+
+type EditorFactory = (tui: TUI, theme: EditorTheme, keybindings: KeybindingsManager) => CustomEditor;
 
 function timeLeft(milliseconds: number): string {
   const minutes = Math.max(0, Math.ceil(milliseconds / 60_000));
@@ -15,6 +20,9 @@ export default function inputPanel(pi: ExtensionAPI) {
   let busy = false;
   let working = false;
   let inputWidth = 0;
+  let selected = false;
+  let generation = 0;
+  let release: (() => void) | undefined;
 
   pi.registerComposerShape({
     label: "Ai-Kit quota input",
@@ -65,7 +73,7 @@ export default function inputPanel(pi: ExtensionAPI) {
   });
 
   async function refresh(ctx: ExtensionContext) {
-    if (busy || ctx.mode !== "tui") return;
+    if (!selected || busy || ctx.mode !== "tui") return;
     theme = ctx.ui.theme;
     enabled = ctx.model?.provider === "openai-codex";
     report = undefined;
@@ -78,11 +86,13 @@ export default function inputPanel(pi: ExtensionAPI) {
     const row = auth.credentials.list(model.provider).find(item => item.id === account?.credentialId);
     if (!row) return;
     busy = true;
+    const requestGeneration = generation;
     try {
       const value = await auth.usage.report(model.provider, row.credential, { baseUrl: model.baseUrl, timeoutMs: 2000 });
       const current = auth.oauth.accounts(model.provider, sessionId);
       const active = current.find(item => item.active) ?? (current.length === 1 ? current[0] : undefined);
-      if (ctx.model?.provider === model.provider && active?.credentialId === row.id) report = value ?? undefined;
+      if (selected && generation === requestGeneration && ctx.sessionManager.getSessionId() === sessionId
+        && ctx.model?.provider === model.provider && active?.credentialId === row.id) report = value ?? undefined;
     } catch (error) {
       pi.logger.warn("Input quota unavailable", { error: String(error) });
     } finally {
@@ -91,21 +101,67 @@ export default function inputPanel(pi: ExtensionAPI) {
   }
 
   pi.on("session_start", (_event, ctx) => {
+    release?.();
+    release = undefined;
     if (ctx.mode !== "tui") return;
-    const previous = ctx.ui.getEditorComponent();
-    ctx.ui.setEditorComponent((tui, palette, keybindings) => {
-      const editor = previous?.(tui, palette, keybindings) ?? new CustomEditor(tui, palette, keybindings);
-      const render = editor.render.bind(editor);
-      editor.render = width => {
-        editor.placeholder = undefined;
-        const text = editor.getText();
-        inputWidth = text.includes("\n") ? Infinity : visibleWidth(text);
-        return render(width);
+    const settings = findScopedSettings(ctx.cwd);
+    if (!settings) throw new Error("Ai-Kit input panel: session settings unavailable.");
+    let previous: EditorFactory | undefined;
+    let wrapper: EditorFactory | undefined;
+    let stopPolling: (() => void) | undefined;
+    const sync = () => {
+      const next = cfgComposerShape.get(settings) === "ai-kit.input-panel";
+      if (next === selected) return;
+      selected = next;
+      generation++;
+      report = undefined;
+      enabled = false;
+      inputWidth = 0;
+      if (!selected) {
+        stopPolling?.();
+        stopPolling = undefined;
+        if (wrapper && ctx.ui.getEditorComponent() === wrapper) ctx.ui.setEditorComponent(previous);
+        wrapper = undefined;
+        return;
+      }
+      previous = ctx.ui.getEditorComponent();
+      wrapper = (tui, palette, keybindings) => {
+        const editor = previous?.(tui, palette, keybindings) ?? new CustomEditor(tui, palette, keybindings);
+        const render = editor.render.bind(editor);
+        editor.render = width => {
+          if (!selected) return render(width);
+          const text = editor.getText();
+          inputWidth = text.includes("\n") ? Infinity : visibleWidth(text);
+          const placeholder = editor.placeholder;
+          editor.placeholder = undefined;
+          try {
+            return render(width);
+          } finally {
+            editor.placeholder = placeholder;
+          }
+        };
+        return editor;
       };
-      return editor;
-    });
-    void refresh(ctx);
-    ctx.setInterval(() => refresh(ctx), 60_000);
+      ctx.ui.setEditorComponent(wrapper);
+      void refresh(ctx);
+      const timer = ctx.setInterval(() => refresh(ctx), 60_000);
+      stopPolling = () => ctx.clearTimer(timer);
+    };
+    const unsubscribe = settings.onLayersChange(sync);
+    release = () => {
+      unsubscribe();
+      selected = false;
+      generation++;
+      enabled = false;
+      report = undefined;
+      stopPolling?.();
+      if (wrapper && ctx.ui.getEditorComponent() === wrapper) ctx.ui.setEditorComponent(previous);
+    };
+    sync();
+  });
+  pi.on("session_shutdown", () => {
+    release?.();
+    release = undefined;
   });
   pi.on("agent_start", () => { working = true; });
   pi.on("agent_end", () => { working = false; });

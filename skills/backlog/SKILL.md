@@ -1,9 +1,10 @@
 ---
 name: backlog
-description: "Use for Backlog.md task and document work: find existing work, create or refine tasks, plan execution, record blockers and evidence, and prepare acceptance. Resolve the owning tracker before operating in nested repositories or linked worktrees; use that tracker's policy and native CLI or MCP."
+description: Create, plan, update or finalize Backlog.md tasks and product artifacts in their owning tracker.
 ---
-
 # Backlog.md
+
+Apply `skill://no-ai-slop` silently to authored task notes, comments, decisions and documents; preserve requirements, IDs, evidence and required format. Backlog is the sole task requirements/plan/progress/evidence index. Documents hold product/task artifacts, not generic installation recipes or a parallel memory lifecycle. Hindsight holds authorized durable knowledge/preferences/lessons; Ripwire reads current code.
 
 ## Resolve the owning tracker first
 
@@ -28,33 +29,14 @@ Read the matching guide before its operation:
 
 Read `backlog <command> --help` for unfamiliar CLI operations, including document/config changes. Use native CLI or MCP for task, draft, document, decision, and milestone writes, never direct Markdown edits. Change native configuration only by its supported mechanism; direct config editing is limited to settings for which native guidance explicitly requires it. Do not install custom guards, scripts, or hooks to enforce this workflow.
 
-## Find and define work
+## Operation routing
 
-1. Search meaningful words and existing domain labels before creating anything. Inspect matching open records and their parents; reuse the appropriate task rather than duplicate it. Use focused filters and the native pagination hints instead of listing the whole tracker. Multiple label filters are AND.
-2. Capture the outcome, why it matters, beneficiary, confirmed context, scope, unknowns, and sources. Follow the project's title language and format. Do not turn an unresearched implementation idea into a requirement or create speculative follow-up work without authorization.
-3. Apply the project's required type, priority, due date, labels, initial status, and other metadata. Read those values from policy/config, not another project's defaults. Do not invent native defaults or treat a deadline as a priority. If a required decision is missing, ask for the missing decisions together before saving.
-4. Dates come from an agreed commitment or confirmed milestone, with calculation assumptions recorded. Never fabricate dates, silently roll overdue work forward, or put a child beyond its parent's deadline without resolving the conflict. Use only confirmed assignee identifiers or an explicitly agreed configured default; Git identity is not an assignee. Establish the executor before execution, not necessarily before initial recording.
-5. Split initiatives into independently verifiable deliverables, not daily/file/test chores. Use an existing parent ID and real prerequisite dependencies; identify each prerequisite's output. Avoid cycles, including a parent depending on its own children. Unresolved or ambiguous dependency IDs are not satisfied prerequisites.
-6. Acceptance criteria describe observable outcomes, relevant edge cases and safety boundaries. Preserve every owner requirement. Keep AC distinct from inherited Definition of Done. For research/docs, evidence can be a sourced document with conclusions and explicit unknowns; do not require code changes just to close it.
-7. Create/refine through native tools and inspect the returned metadata, including parent, dependencies, date, priority, labels, and assignee. A metadata correction alone does not authorize implementation or a status transition. Report IDs, changed commitments, and unresolved assumptions briefly.
+After the native overview, read only the relevant local contract and native guide:
 
-## Execute and hand off
-
-Read the task, references, dependencies, blockers, and project policy before mutation. Use the configured active status and confirmed executor. Research the actual current system, then record the implementation plan before implementation. Material scope/design decisions and project-required approvals remain with the owner; routine authorized implementation does not need another approval ritual.
-
-Keep the task as the requirements/plan/progress/evidence/acceptance record. Notes hold progress and verification; comments hold discussion and changes to decisions, priority, or commitments. Link the exact repository, relevant commits/MR and explanatory documents or Whiteboard. Do not store secrets or claim deployment/production acceptance from local source.
-
-Use the project's blocker representation with reason, unblocker, next action, and recheck date; remove it when resolved. Dependency-only `--ready` is not proof that review, blockers, access, or operational approvals permit work. Respect the project's work-in-progress limit and explicit ownership for parallel slices.
-
-Use the configured review/release states only with their documented evidence and approvals. Review readiness, reviewer approval, release readiness, publication, deployment, and final acceptance are different facts. If MCP rejects a configured custom status, use native `backlog task edit <ID> --status <configured-status>` from the owning tracker, not a substitute label or a direct record edit.
-
-Include the project's required review material in the task and owner handoff. Where policy requires tuicr, provide a copy-paste command using the real code repository and exact task commit range: `cd /absolute/repo/path && tuicr -r 'BASE..HEAD'`; use `COMMIT^..COMMIT` for one commit, not an accumulated branch diff. Explain non-applicability for non-code work. Do not invent a commit range for uncommitted changes.
-
-## Close on evidence
-
-Read finalization guidance and check every AC and applicable DoD against observed evidence. Record actual checks, results, scope, limitations, and genuine non-applicability. Do not check a box because code exists, a check was proposed, or an approval is expected; non-applicability cannot waive an explicit requirement. Complete required review, acceptance, and delivery before the configured final status. Close a parent only after its children and its own acceptance.
-
-Write the final summary and retain finished records until separately authorized archival. Cancellation, duplication, or blockage is not successful completion; preserve the reason and history instead of marking it Done or deleting it.
+- Create/refine/split/search: [creation](references/creation.md), plus native `task-creation` when creating.
+- Plan/execute/status/progress/blockers/review handoff: [execution](references/execution.md), plus native `task-execution`.
+- Acceptance/final summary/close: [finalization](references/finalization.md), plus native `task-finalization`.
+- Documents/configuration: command help and owning product/task policy, not generic tool documentation copies.
 
 ## Access and storage boundaries
 
