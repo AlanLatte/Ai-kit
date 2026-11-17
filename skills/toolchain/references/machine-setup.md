@@ -1,13 +1,11 @@
 # Machine environment setup
 
-Apply `skill://no-ai-slop` silently to authored questions, setup explanations, readiness reports and documentation using the context already available. Preserve form fields, commands, exact evidence, limitations and the required language/output structure; do not add an editing report or turn a prose pass into installation or publication approval.
-
 Ai-Kit is a user-scoped package of shared tools and environment procedures.
 Workspace roots and tool inventories are supplied by the caller.
 
 ## Select the requested scope first
 
-For an explicit workspace toolchain setup/check/report, including a project-kit delegation with a workspace root and declared tool inventory, follow [the workspace procedure](workspace.md) and stop after that flow. Install the ENTIRE caller-declared inventory on approved setup, not just current-task tools. This targeted flow does not run the machine-wide inventory, questionnaire or common installer below and does not authorize authentication, key/credential changes or services. Startup and report remain read-only; no automatic installation. Keep project inventories in their owning plugins.
+For an explicit workspace setup, including a project-kit delegation with a canonical root and inventory, follow [workspace setup](workspace.md) and prepare the ENTIRE caller-declared inventory. For a workspace report or task-specific tool check, use [read-only readiness](readiness.md) instead. Both bypass the machine-wide questionnaire and installer below; neither authorizes authentication, key/credential changes or services. Startup and report remain read-only. Keep project inventories in their owning plugins.
 
 A workspace is the existing root of related repositories, shared tracker and
 client/environment settings. Ai-Kit's [local `.config` layout](../../project-setup/references/workspace-layout.md)

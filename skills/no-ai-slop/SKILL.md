@@ -1,22 +1,32 @@
 ---
 name: no-ai-slop
-description: Edit or detect patterns in human prose; silently refine authored text without changing evidence or format.
+description: Edit/audit drafts or draft substantial docs/PRs/reports. Not routine replies, statuses or titles.
 license: MIT
 ---
 
 # No AI slop
 
-Read the [pinned upstream editing rules](../../vendor/no-ai-slop/SKILL.md) and [self-check](../../vendor/no-ai-slop/eval.md) when they are not already in context. This wrapper defines how those unchanged rules apply in engineering workflows: embedded output/context rules below override upstream draft requests and reporting, and preservation requirements override stylistic word bans.
+Choose the mode below before reading references. Reuse rules already in context; a new workflow stage or subagent result is not a reason to reload them or repeat an editing pass.
 
 ## Standalone edit or detect
 
 For an explicit request to edit a supplied draft, preserve upstream behavior: make the minimum effective edit, then return the full edited draft and a short **What changed** section, unless the user requires another format. For detect/audit-without-rewriting requests, name each observed pattern, quote the line and give a short fix; do not rewrite, score or infer AI authorship. Ask for a missing draft or genuinely missing audience/goal only when the conversation does not already supply it.
 
-## Embedded prose pass
+For standalone editing or detection, read the [pinned upstream rules](../../vendor/no-ai-slop/SKILL.md) and [self-check](../../vendor/no-ai-slop/eval.md). Their draft requests and output rules apply only to this mode, subject to the user's requested format and the preservation rules below.
 
-Apply the editing principles silently to all human prose you author: ordinary replies; commit subjects and bodies; PR/MR titles, descriptions, comments and reviews; release/hotfix notes and tag annotations; incident updates; reports, worklogs, task records and documentation. Include prose produced by native subagents and prose inside tool arguments or files, not only the final reply. Use the draft, evidence and audience already available; do not ask the user to paste the same text or announce an editing stage.
+## Substantive artifact writing
 
-Before sending or saving, make the minimum effective prose edit and self-check in the same reasoning pass. Keep the workflow's exact output contract: no appended **What changed**, pattern report, pass/fail checklist or extra section in a commit, report, structured response or ordinary reply. An explicit standalone request above is the exception. No mandatory second agent, extra model/network call or automatic output postprocessing is needed.
+Use this mode when drafting or substantially revising a human-facing document, PR/MR description, developed review finding, release/tag note, incident analysis, or substantive report/worklog/task artifact. It applies to assigned files, tool arguments and subagent prose as well as chat. It does not independently apply to ordinary technical replies, acknowledgements, short factual statuses, link handoffs, one-line commit subjects/titles, unchanged templates, commands, logs, code or structured receipts. An explicit editorial request still selects standalone mode, even for a short text.
+
+Edit silently in the current authoring pass using the available draft, evidence and audience:
+
+- Lead with the concrete result, problem or decision; remove generic introductions, repetition, unsupported importance claims and rhetorical reveals.
+- Prefer exact facts and direct verbs. If a sentence could move unchanged to an unrelated project, replace it with supported detail or cut it.
+- Preserve the writer's voice and useful structure; split only genuinely tangled sentences. Do not rotate technical terms or force uniform paragraphs.
+- Remove decorative emphasis, fake conclusions and summaries that only repeat the text. Keep necessary headings, lists and report fields.
+- Read the result once for meaning, evidence, clarity and the required format. Fix actual problems, not every stylistic difference.
+
+These rules are sufficient for this mode; do not load the upstream catalog or self-check automatically. Do not append **What changed**, a pattern report, checklist or new section. No second agent, extra model/network call or output postprocessor is needed.
 
 ## Preserve meaning and authority
 

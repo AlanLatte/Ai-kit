@@ -4,7 +4,7 @@ description: Create, plan, update or finalize Backlog.md tasks and product artif
 ---
 # Backlog.md
 
-Apply `skill://no-ai-slop` silently to authored task notes, comments, decisions and documents; preserve requirements, IDs, evidence and required format. Backlog is the sole task requirements/plan/progress/evidence index. Documents hold product/task artifacts, not generic installation recipes or a parallel memory lifecycle. Hindsight holds authorized durable knowledge/preferences/lessons; Ripwire reads current code.
+Backlog is the sole task requirements/plan/progress/evidence index. Documents hold product/task artifacts, not generic installation recipes or a parallel memory lifecycle. Hindsight holds authorized durable knowledge/preferences/lessons; Ripwire reads current code. For drafting or substantially revising a substantive task document or plan, use `skill://no-ai-slop` once; short status, AC and evidence updates do not independently require it. Preserve requirements, IDs, evidence and required format.
 
 ## Resolve the owning tracker first
 

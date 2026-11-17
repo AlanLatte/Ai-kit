@@ -12,7 +12,6 @@
     "extensions": [
       "./omp/ponytail.mjs",
       "./omp/memory.mjs",
-      "./omp/no-ai-slop.mjs",
       "./omp/input-panel.ts"
     ]
   },

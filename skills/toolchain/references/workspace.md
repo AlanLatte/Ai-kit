@@ -27,7 +27,7 @@ the tools-only flow reports unrelated Git/auth/service work without doing it.
 
 ## 1. Select scope and inspect without mutation
 
-Route workspace setup/check/report here before the machine-wide questionnaire. Reuse supplied scope and approval; ask only for missing scope/inventory or a real conflict. Startup, reading a skill, check and report never authorize installation. Report mode must not bootstrap mise, trust configuration, resolve remote versions, install tools, write locks or run commands that auto-install. If mise is absent, report that prerequisite as missing.
+For workspace setup, reuse supplied scope and approval; ask only for missing scope/inventory or a real conflict. A task-specific check or workspace report uses [read-only readiness](readiness.md) instead; do not preload installation sections. Startup, reading a skill, check and report never authorize installation. Report mode must not bootstrap mise, trust configuration, resolve remote versions, install tools, write locks or run commands that auto-install. If mise is absent, report that prerequisite as missing.
 
 Inspect the OS/architecture, installed mise version, relevant inherited configuration, workspace and repository version files, native runners and lockfiles. Read config, hooks, templates and sourced code before executing it or trusting it. Privately record relevant config hashes and plain executable paths/versions in a shell outside the workspace for comparison afterward. Do not print private environment values.
 

@@ -13,5 +13,5 @@ Unmodified files from this commit:
 No upstream scripts, agents, assets or plugin runtime are included.
 The sole public skill is ../../skills/no-ai-slop/SKILL.md; this vendor
 folder is outside the declared skill discovery roots. That local MIT
-wrapper adds silent embedded engineering-prose semantics without changing
-these upstream files. Native prompt registration is ../../omp/no-ai-slop.mjs.
+wrapper adds conditional engineering-prose guidance without changing these
+upstream files. No native runtime injects an editing instruction on every turn.
