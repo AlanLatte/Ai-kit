@@ -125,6 +125,10 @@ cwd. Nor does it automatically apply a nested repository's extra mise config.
 Use native repository runners and existing repository `.envrc` files; inspect
 and, only within approved setup, merge reviewed parent loading with child-native
 activation where needed. Verify each conflicting repository selection explicitly.
+For selected LSP integration, the normal launch directory remains this workspace,
+not an arbitrarily chosen child checkout. Follow the [workspace LSP procedure](lsp.md#sessions-launched-from-a-multi-repository-workspace):
+verify launch-root server discovery and independent child analysis environments.
+Root PATH activation alone does not make child language projects LSP-ready.
 Do not scatter generated `.envrc` files or locks across every checkout.
 
 For automation without direnv or a shell that has not loaded `.envrc`, use the
