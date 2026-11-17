@@ -23,7 +23,7 @@ These are semantic examples, not permission to add or rename states, require a d
 
 When review finds defects, tests fail, a release is rolled back or acceptance is withdrawn, move back to the appropriate configured state with the reason and next action. Uncheck only AC/DoD invalidated by that evidence; retain valid proof. On reopening, remove or revise a stale final summary through native tools so it no longer claims current completion, preserving the earlier outcome in history. For a blocker without a dedicated state, retain the last truthful state and record the blocker explicitly. A fix on a branch does not put the task back On Dev until redeployment is verified.
 
-Before handoff or ending the session, save the achieved state, meaningful evidence, unresolved blockers and next owner/action. Do not force Done when your assigned slice is finished but review/testing/release belongs to someone else. Report the task ID and handoff state; keeping a task current does not authorize performing those other stages.
+Before handoff or ending the session, save the achieved state, meaningful evidence, unresolved blockers and next owner/action. Do not force Done when your assigned slice is finished but review/testing/release belongs to someone else. Report the task ID and handoff state only inside the personal tracker or private owner/agent handoff, never in a shared commit/MR/release/team artifact. Shared handoffs describe the change and link shared evidence without the personal task reference. Keeping a task current does not authorize performing those other stages.
 
 ### Record each status transition
 
