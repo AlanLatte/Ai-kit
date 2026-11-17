@@ -28,6 +28,53 @@ handoff](models.md). Preserve the user's ordinary-chat default and existing
 assignments; explicit `@plan` authorship and `@slow` review do not require an
 expensive default reset. No inference/benchmark is a setup readiness check.
 
+## Plugin delivery and upgrades
+
+Installing or upgrading a plugin does not authorize machine/workspace setup.
+Inspect native `omp plugin --help` and the current marketplace source, version,
+scope and actual cache paths. Privately back up registries and the original
+caches before upgrading; native upgrade can delete old version paths still used
+by open sessions. Restore those original paths from backup until sessions restart,
+without registering old versions or claiming reconstructed sources are original bytes.
+
+Immutable source snapshots can copy read-only directory modes into the installed
+cache. Check the target plugin cache owner and directory write bits before an
+upgrade and after installation. Keep source snapshots read-only; repair only
+approved cache directories for their owning user, never recursively chmod/chown
+the home or unrelated plugins. Unexpected ownership requiring administration is
+an owner action, not permission to run the setup as root. Verify installed files,
+versions, scopes and unchanged unrelated configuration before reporting success.
+
+## Native interaction and update policy
+
+During approved OMP setup, inspect these effective values and their explicit
+global/project layers. Reuse matching values without writes. For unset settings,
+the recommended setup includes the following defaults; disclose the five-minute
+form auto-submit before applying it. Preserve explicit customizations, including
+`0`, `false` and `off`, unless the owner approves replacing those exact values.
+Check/report, plugin delivery and workspace-tool-only setup do not apply them.
+
+| Setting | Recommended value | Behavior |
+|---|---|---|
+| `ask.enabled` | `true` | Enable native question forms |
+| `ask.timeout` | `300` | Submit current form values after five minutes; `0` waits indefinitely |
+| `ask.notify` | `on` | Notify while a form awaits input |
+| `marketplace.autoUpdate` | `notify` | Notify about plugin updates without installing them automatically |
+
+These keys were checked against OMP 18.22.0's native config schema. Inspect the
+installed schema first; report unsupported keys rather than inventing equivalents
+or upgrading OMP. Privately back up the selected profile and use native
+`omp config set KEY VALUE` only for missing/approved values. Read each back with
+`omp config get KEY --json` in a fresh process at the target cwd, resolving any
+project override instead of repeatedly writing an ineffective global value.
+
+The timeout applies to `ask` forms, not questions in ordinary chat. It submits
+current/preselected answers, not a model-generated answer. Native `cfg://` approval
+prompts are also bounded, but an unanswered approval denies the write. A timed-out
+form is not new authorization for installation, authentication, host trust,
+clipboard access or destructive work: obtain explicit owner approval first;
+auto-submit may choose only within the already approved scope.
+
 ## Native token rate
 
 Approved OMP setup includes the native tokens/sec display. In the effective

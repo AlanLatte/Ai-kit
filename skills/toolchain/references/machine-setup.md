@@ -39,6 +39,10 @@ Also inspect `omp --version`, `backlog --version` and Whiteboard through its dis
 
 Use answers already supplied in the conversation instead of asking again. Explicitly requesting recommended setup is a mode answer, not a reason to show another selector. Cancellation before the flow is complete means no directory creation, installation, service startup, config writes or tracker initialization.
 
+A timer submitting preselected form values is not owner approval. Obtain explicit
+authorization before installation or trust-sensitive actions; automatic answers
+may select details only inside an already approved scope.
+
 ### Question 1: where will projects live?
 
 Show one editable path, prefilled with the detected development root. If several roots exist, prefer the most specific existing root containing the current workspace. If none is known, suggest `~/Developments`. Accept another path in that same question; do not ask the user to choose profiles, repositories or accounts here. Normalize it as a filesystem path, never a shell command. Create an approved missing directory only after the setup mode is answered. A development root is not a Git repository and does not authorize rewriting every workspace beneath it.
@@ -47,14 +51,14 @@ Show one editable path, prefilled with the detected development root. If several
 
 Show only these two choices:
 
-- **Реши все за меня (рекомендуется)**, selected by default. Disclose missing recommended tools and official dependencies, integrations, direnv shell hook, selected LSP servers, native OMP UI and model-role setup, and necessary local services. Preserve settings/data/keys and the user's ordinary-chat default; conflicting role/bar assignments need resolution. Discover requested bridge directions, but forwarding, browser tabs, clipboard access and private authentication require their explicit trust/authorization decision. Project `.envrc` is created only during explicit project setup, not across every checkout.
+- **Реши все за меня (рекомендуется)**, selected by default. Disclose missing recommended tools and official dependencies, integrations, direnv shell hook, selected LSP servers, native OMP UI, five-minute ask auto-submit, plugin update notifications and model-role setup, and necessary local services. Preserve settings/data/keys and the user's ordinary-chat default; conflicting role/bar assignments need resolution. Discover requested bridge directions, but forwarding, browser tabs, clipboard access and private authentication require their explicit trust/authorization decision. Project `.envrc` is created only during explicit project setup, not across every checkout.
 - **Хочу выбрать сам**. Show one component list with every item selected by default; the user removes unwanted items. Do not follow it with another MCP, profile, service-mode or dependency questionnaire. Include the same free-form language input in that component form when the mode form did not already collect it.
 
 The native mode form can use this shape:
 
 ```html
 <form>
-<p>Агент установит недостающее, подключит интеграции, direnv и выбранные LSP, настроит native OMP UI и модельные роли и запустит необходимые локальные сервисы. Данные, ключи и обычная default-модель сохраняются; конфликты настроек согласуются. Для bridges сначала определяются направления и доверие; forwarding, tabs, clipboard и приватная аутентификация требуют отдельного разрешения. .envrc создается только при настройке выбранного проекта.</p>
+<p>Агент установит недостающее, подключит интеграции, direnv и выбранные LSP, настроит native OMP UI, автоотправку ask через пять минут, уведомления об обновлениях plugins и модельные роли и запустит необходимые локальные сервисы. Данные, ключи и обычная default-модель сохраняются; конфликты настроек согласуются. Для bridges сначала определяются направления и доверие; forwarding, tabs, clipboard и приватная аутентификация требуют отдельного разрешения. .envrc создается только при настройке выбранного проекта.</p>
 <fieldset>
 <legend>Как настроить окружение?</legend>
 <label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP/роли, память, Backlog, Whiteboard, Git/ghq/GCM, подписи, direnv, LSP, discovery bridges и общие инструменты</label>
