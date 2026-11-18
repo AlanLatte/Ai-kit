@@ -14,7 +14,9 @@ Keep inventory private and ephemeral. Report only the chosen selectors/roles and
 
 ## 2. Select using evidence, not labels
 
-Choose a strong planner/research/task-artifact author and a strong reviewer from eligible models using known task capability, context, tools/modalities, supported effort and existing owner preferences. Prefer a cheaper capable executor only with supported capability and **known effective price** evidence for the expected input/output/cache mix. Catalog price, subscription billing and actual marginal account cost can differ. `pricingStatus=unknown`, missing cost or a zero placeholder is unknown, not free. Do not infer reasoning quality or cost from provider/model names, run paid benchmarks/judges, or invent a savings percentage.
+Choose planning and review models for analysis and verification. Choose a capable draft/implementation model for following a settled plan. Use the capabilities, context, tools/modalities, supported effort and owner preferences of the models actually available in this profile. This works with a single provider (including Claude-only or Codex-only profiles) or several; never require a particular provider, model family or tier. The planner and reviewer can use the same model in separate sessions.
+
+Prefer a cheaper capable executor only with **known effective price** evidence for the expected input/output/cache mix. Catalog price, subscription billing and actual marginal account cost can differ. `pricingStatus=unknown`, missing cost or a zero placeholder is unknown, not free. Do not infer reasoning quality or cost from provider/model names, run paid benchmarks/judges, or invent a savings percentage.
 
 Preserve every existing role/agent override unless changing that exact assignment is approved; proposed improvements to conflicting assignments require the owner. If no proven cheaper capable executor exists, retain a capable selection, state that cheap execution is unproven, and complete the supported routing without a fake budget claim. A single eligible model can serve all roles; that is not a cheap/strong split.
 
@@ -22,14 +24,15 @@ Preserve every existing role/agent override unless changing that exact assignmen
 
 Privately back up the affected local files. Set missing or approved role mappings through the native `/model` Roles view, or native record writes. For profile-global storage, merge into the latest `modelRoles` record and pass the resulting JSON as **one literal argument** to `omp config set modelRoles '<merged JSON>'`. Read back `omp config get modelRoles --json`. Never replace the record with a partial map. CLI `config --scope` is a listing filter, not a project-write flag. For approved project-only routing, selectively merge `modelRoles` into that project's resolved `.omp/config.yml`; preserve other YAML and inherited profile roles. Do not change `modelRoleStorage` merely to make a write land.
 
-Populate only missing/approved entries, with concrete selectors discovered above stored LOCAL only:
+In `/model`, `Kind` filters the catalog; it does not assign a model to a workload. Open **Roles**, select a row and press Enter to pick a model. Use the active profile on the machine where OMP runs (the Mac and a remote shell have separate settings). For plan -> draft -> review, assign `plan`, `task` and `slow`; leave every unrelated role unchanged, including `smol` unless separately requested. Store the selected `provider/id` values only in local settings.
 
 | Native role | Purpose |
 |---|---|
 | `default` | Preserve the user's ordinary-chat default; no strong-model reset is needed |
-| `plan` | Strong planner/research/task-artifact author, selected explicitly for that work |
-| `task`, `smol` | Evidence-supported capable executor; cheaper only when proven |
-| `slow` | Strong final reviewer |
+| `plan` | `/plan` in the parent session; also used by the research and task-artifact specialists below |
+| `task` | Bundled `task` subagent for routine drafts or bounded implementation |
+| `slow` | Bundled `reviewer` subagent for independent review |
+| `smol` | Optional fast role for `sonic` or an explicitly enabled prewalk; it does not select the bundled `task` subagent's model |
 
 No concrete provider/model IDs ship as Ai-Kit defaults. This is native role configuration, not fictional SKILL frontmatter `model` fields. Generic native task uses `@task`; reviewer uses `@slow`. A role name alone proves neither capability nor price.
 
@@ -44,6 +47,8 @@ Read `modelRoles` and `task.agentModelOverrides` in a fresh process at the same 
 Ordinary native role/agent resolution can fall back to the parent's authenticated model when configured worker credentials are unusable. Retry/fallback chains can add other allowed selections. Preserve existing settings; inspect and list the owner-allowed fallback selectors locally. This setup is **not a hard cost cap**. During an actual authorized worker call, inspect native task progress/agent-hub routing: `resolvedModel` identifies the serving selector and `resolvedModelIsFallback` marks fallback, with `resolvedModelIdentity` and `resolvedThinkingLevel` when provided. Compare the observed selection with the approved primary/fallback set and known price; record it in task evidence. If it is outside that set, stop additional dispatch and report it. Missing serving metadata is unverified routing, never proof of cheap execution. Do not make inference calls merely to collect this evidence during setup.
 
 ## 5. Handoff for real work
+
+For a document or other standalone draft, enter `/plan` and ask for a plan without writing the draft. After approving or exiting plan mode, ask the parent to delegate the draft to `task`, then hand the result and requirements to `reviewer` for a separate check. A role only selects a model when that workload runs; it does not start the next phase. For a direct, one-off draft, select the drafting model as the active chat model instead.
 
 Use [the bounded handoff template](../templates/task-handoff.md), not automatic difficulty classification:
 
