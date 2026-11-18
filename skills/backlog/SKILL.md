@@ -35,7 +35,7 @@ After the native overview, read only the relevant local contract and native guid
 
 - Create/configure a tracker or change its workflow: [setup](references/setup.md), plus installed init/config help and existing project policy.
 - Create/refine/split/search, task formatting or tags/labels: [creation](references/creation.md), plus native `task-creation` when creating.
-- Plan/execute/status/progress/blockers/review handoff: [execution](references/execution.md), plus native `task-execution`.
+- Plan/execute/status/progress/blockers/review handoff or dev delivery: [execution](references/execution.md), including its owner-review continuation contract, plus native `task-execution`.
 - Acceptance/final summary/close: [finalization](references/finalization.md), plus native `task-finalization`.
 - Documents/configuration: command help and owning product/task policy, not generic tool documentation copies.
 
@@ -47,7 +47,7 @@ Use configured states with their entry evidence, never infer deployment or appro
 
 ## Access and storage boundaries
 
-Backlog is a personal tracker unless the owner explicitly identifies it as a shared tracker. Never include personal tracker IDs, task titles used as private references, local tracker paths or links in shared artifacts: commit subjects/bodies/trailers, branch names, MR/PR titles/descriptions/comments, tags, release notes, changelogs, repository documentation or team messages. A private remote repository is still shared; opening an MR does not make a personal task public. Do not emit `TASK-...`, `Fixes`/`Closes` references or equivalent private identifiers there, even when a template requests a task number. Describe the change, component, versions and observed result without the private reference. Use an actual shared issue only when its identity and audience are verified; never translate a personal task number into a hosting issue number.
+Backlog is personal unless the owner identifies a shared tracker. Never put personal tracker IDs, private task references, local paths or links in shared artifacts: commit subjects/bodies/trailers, branches, MR/PR titles/descriptions/comments, tags, release notes, changelogs, repository docs or team messages. Private remote repositories are shared too. Do not emit `TASK-...`, `Fixes`/`Closes` or equivalent private references there, even if a template requests a task number. Describe the component, change, versions and result instead. Use a shared issue only after verifying its identity and audience; never convert a personal task number into a hosting issue number.
 
 Keep traceability one-way: the personal Backlog record may link commits, MR/PR, CI and deployment evidence; those artifacts must not link back to the personal task. IDs remain valid in the personal tracker and private owner/agent handoffs. Before committing or sending a shared artifact, check its title and full body for private references. This does not authorize rewriting Git history or editing other people's published artifacts.
 
