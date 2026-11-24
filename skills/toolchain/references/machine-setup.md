@@ -60,9 +60,10 @@ The native mode form can use this shape:
 <form>
 <p>Агент установит недостающее, подключит интеграции, direnv и выбранные LSP, настроит native OMP UI, автоотправку ask через пять минут, уведомления об обновлениях plugins и модельные роли и запустит необходимые локальные сервисы. Данные, ключи и обычная default-модель сохраняются; конфликты настроек согласуются. Для bridges сначала определяются направления и доверие; forwarding, tabs, clipboard и приватная аутентификация требуют отдельного разрешения. .envrc создается только при настройке выбранного проекта.</p>
 <p>tmux не входит в рекомендуемый набор. Его можно включить при ручном выборе или запросить отдельно.</p>
+<p>Archify устанавливается как скилл только в текущий клиент, в пользовательскую область текущего профиля. Он запускается только по запросу.</p>
 <fieldset>
 <legend>Как настроить окружение?</legend>
-<label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP/роли, память, Backlog, Whiteboard, Git/ghq/GCM, подписи, direnv, LSP, discovery bridges и общие инструменты</label>
+<label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP/роли, память, Backlog, Whiteboard, Archify, Git/ghq/GCM, подписи, direnv, LSP, discovery bridges и общие инструменты</label>
 <label><input type="radio" name="setup_mode" value="custom"> Хочу выбрать сам</label>
 </fieldset>
 <label>Языки для LSP (свободный ввод, через пробел или запятую; пустое поле - без языков) <input type="text" name="languages" value="go, python"></label>
@@ -77,6 +78,7 @@ In custom mode generate one native multi-select from the following table. Only t
 | hindsight | Native Hindsight memory; existing helper and section 4 below |
 | backlog | Backlog.md and its MCP connector; reuse an existing owning tracker, [Backlog setup](backlog.md) |
 | whiteboard | Whiteboard and its MCP connector; [Whiteboard setup](whiteboard.md) |
+| archify | [Archify](archify.md) for interactive diagrams and explainers; install only for the approved client and scope, invoke on demand |
 | git-workspace | Git, ghq, GCM and existing-key signing; reuse `skill://project-setup` |
 | tuicr | Terminal code review; [official installation methods](https://github.com/agavra/tuicr#install); verify `tuicr --version` |
 | direnv | Per-project environments and an active shell hook; [direnv setup](direnv.md) |
@@ -86,6 +88,8 @@ In custom mode generate one native multi-select from the following table. Only t
 | tmux | Optional, unchecked: [native installation and per-user configuration](tmux.md); register workspaces only through explicit project setup |
 
 Recommended mode selects every entry except tmux. Git is included through `git-workspace`, not a duplicate checkbox. MCP is included with Backlog and Whiteboard, not a separate choice; Hindsight uses OMP's native backend. Additional MCP servers are configured only when explicitly requested. LSP is native, not MCP: install the servers for the user's language answer yourself. Normalize language aliases and duplicates as data, never shell input. Use `go, python` only when the field was not supplied; an explicitly empty field selects no languages. If `lsp` is deselected, ignore the language field and install no language-specific dependencies.
+
+When Archify is selected, disclose the current client, the effective user scope, and explicit invocation before applying the plan. Reuse an explicit target or narrower scope already supplied. Do not install into another agent as a workaround.
 
 Choose technical details yourself: retain the effective current OMP profile and its environment overrides; reuse healthy services and matching Git profiles; prefer an installed Whiteboard mode, otherwise Desktop on a supported graphical machine and headless on a server; use stdio for bundled MCP connectors and preserve appropriate existing client scopes. Keep generic user connectors generic and tracker-specific bindings project-local. Do not ask about these defaults merely because configuration has several possible shapes.
 
