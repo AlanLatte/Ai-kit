@@ -37,15 +37,7 @@ An established project wrapper may enforce routing or policy and depend on an ex
 
 ## 2. Bootstrap only the manager when approved
 
-Reuse a working mise executable, including one outside PATH. When absent, use the [official installation instructions](https://mise.jdx.dev/installing-mise.html) for the actual OS. On macOS/Linux the official user installer is:
-
-```sh
-curl -fsSL https://mise.run -o /private/temporary-directory/mise-install.sh
-sh /private/temporary-directory/mise-install.sh
-~/.local/bin/mise --version
-```
-
-Use an actual private temporary directory in place of the placeholder above. Inspect the downloaded official installer before the `sh` step, verify the executable and remove the temporary download. Ai-Kit installs/reuses this manager once for the user; setup of its package-manager/runtime dependencies remains explicit. Use its resolved absolute path in activation rather than changing shell startup or installing another manager. Do not use sudo, replace a working mise or silently upgrade an incompatible installation.
+Reuse a working mise executable, including one outside PATH. When absent, follow the [host-native procedure](native-installation.md) and [mise's official installation instructions](https://mise.jdx.dev/installing-mise.html). Prefer a supported user-local route, inspect any downloaded installer before execution, and verify the actual executable/version. Ai-Kit installs or reuses the manager once for the user; package-manager/runtime dependencies remain explicit. Use the resolved absolute path in activation rather than changing shell startup. Do not use sudo, replace a working mise or silently upgrade an incompatible installation.
 
 Use mise's native user-private versioned installation/cache directories (respect existing MISE_DATA_DIR and MISE_CACHE_DIR after checking ownership and scope). Shared cached artifacts are fine; selected versions belong to workspace/repository config. Never copy tools into a custom bin directory, create wrapper installers, expose mise shims globally or call `mise use --global`/`mise settings` to set defaults.
 

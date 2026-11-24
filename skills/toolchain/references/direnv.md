@@ -1,6 +1,6 @@
 # direnv and project environments
 
-Install only when direnv or explicit project setup was selected. Check/report is read-only. Reuse `direnv version`; on macOS the common helper installs a missing binary with `brew install direnv`. On Linux use the distribution's official package (for example `apt-get install direnv` on Debian/Ubuntu, with permission if required). Other platforms follow the [official installation guide](https://direnv.net/docs/installation.html); never apply a macOS recipe blindly.
+Install only when direnv or explicit project setup was selected. Check/report is read-only. Reuse `direnv version`; otherwise follow the [official installation guide](https://direnv.net/docs/installation.html) and choose a supported package through [host-native installation](native-installation.md).
 
 ## Configure the actual interactive shell
 

@@ -6,45 +6,39 @@ mode=${1:-report}
 selected=("$@")
 script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 hindsight_script="$script_dir/hindsight.mjs"
-printf -v hindsight_install 'node %q install' "$hindsight_script"
 
 TOOLS=(
-  "git|version control|xcode-select --install"
-  "python3|Python tooling|brew install python@3.13"
-  "uv|isolated Python environments|curl -LsSf https://astral.sh/uv/install.sh | sh"
-  "direnv|per-project environment loading|brew install direnv"
-  "docker|explicit local service setup|brew install --cask docker"
-  "pre-commit|repository quality hooks|uv tool install pre-commit"
-  "node|JavaScript tooling and shared helpers|brew install node"
-  "ripwire|focused code navigation|brew install ripwire"
-  "tuicr|terminal code review|brew install tuicr"
-  "jq|JSON inspection|brew install jq"
-  "shellcheck|shell script diagnostics|brew install shellcheck"
-  "tre|directory inspection|brew install tre-command"
-  "hindsight|Hindsight API and native client readiness|$hindsight_install"
+  "git|version control"
+  "python3|Python tooling"
+  "uv|isolated Python environments"
+  "direnv|per-project environment loading"
+  "docker|explicit local service setup"
+  "pre-commit|repository quality hooks"
+  "node|JavaScript tooling and shared helpers"
+  "ripwire|focused code navigation"
+  "tuicr|terminal code review"
+  "jq|JSON inspection"
+  "shellcheck|shell script diagnostics"
+  "tre|directory inspection"
+  "hindsight|Hindsight API and native client readiness"
+  "tmux|optional terminal multiplexer"
 )
 
 usage() {
-  printf 'Usage: toolchain.sh check|report [COMPONENT ...] | install COMPONENT ...\n' >&2
-  printf 'Components: git python3 uv direnv docker pre-commit node ripwire tuicr jq shellcheck tre hindsight\n' >&2
+  printf 'Usage: toolchain.sh check|report [COMPONENT ...]\n' >&2
+  printf 'Components: git python3 uv direnv docker pre-commit node ripwire tuicr jq shellcheck tre hindsight tmux\n' >&2
 }
 
 case "$mode" in
   check|report) ;;
-  install)
-    if [ "${#selected[@]}" -eq 0 ]; then
-      printf 'Select components first; installation without a selection is forbidden.\n' >&2
-      usage
-      exit 2
-    fi
-    ;;
+  install) printf 'Use the toolchain skill for host-native installation.\n' >&2; exit 2 ;;
   *) usage; exit 2 ;;
 esac
 
 for requested in ${selected[@]+"${selected[@]}"}; do
   found=0
   for row in "${TOOLS[@]}"; do
-    IFS='|' read -r name _ _ <<<"$row"
+    IFS='|' read -r name _ <<<"$row"
     if [[ "$requested" == "$name" ]]; then found=1; break; fi
   done
   if [ "$found" -eq 0 ]; then
@@ -55,7 +49,10 @@ for requested in ${selected[@]+"${selected[@]}"}; do
 done
 
 is_selected() {
-  [ "${#selected[@]}" -ne 0 ] || return 0
+  if [ "${#selected[@]}" -eq 0 ]; then
+    [[ "$1" != tmux ]]
+    return
+  fi
   for requested in "${selected[@]}"; do
     [[ "$requested" != "$1" ]] || return 0
   done
@@ -67,7 +64,7 @@ collect_readiness() {
   present=()
   hindsight_error=
   for row in "${TOOLS[@]}"; do
-    IFS='|' read -r name why how <<<"$row"
+    IFS='|' read -r name _ <<<"$row"
     is_selected "$name" || continue
     if [[ "$name" == hindsight ]]; then
       if ! command -v node >/dev/null 2>&1; then
@@ -80,14 +77,14 @@ collect_readiness() {
       present+=("$name")
       continue
     fi
-    missing+=("$name|$why|$how")
+    missing+=("$row")
   done
 }
 
 print_missing() {
   for row in ${missing[@]+"${missing[@]}"}; do
-    IFS='|' read -r name why how <<<"$row"
-    printf '  %-12s %s\n      %s\n' "$name" "$why" "$how"
+    IFS='|' read -r name why <<<"$row"
+    printf '  %-12s %s\n' "$name" "$why"
     if [[ "$name" == hindsight && -n "$hindsight_error" ]]; then
       printf '      %s\n' "$hindsight_error"
     fi
@@ -111,22 +108,7 @@ case "$mode" in
     printf 'Selected tooling is not ready (%d missing):\n' "${#missing[@]}" >&2
     print_missing >&2
     printf 'Use the toolchain skill selector; only selected components may be installed.\n' >&2
+    exit 1
     ;;
   report) print_report ;;
-  install)
-    failed=0
-    for row in ${missing[@]+"${missing[@]}"}; do
-      IFS='|' read -r name why how <<<"$row"
-      printf '\n==> %s (%s)\n' "$name" "$why"
-      if [[ "$name" == hindsight ]]; then
-        if ! node "$hindsight_script" install; then failed=1; fi
-      elif ! eval "$how"; then
-        failed=1
-      fi
-    done
-    collect_readiness
-    print_report
-    [ "${#missing[@]}" -eq 0 ] || failed=1
-    exit "$failed"
-    ;;
 esac

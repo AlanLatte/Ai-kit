@@ -1,6 +1,12 @@
-# Existing SSH signing key without a password manager
+# Existing SSH signing key
 
-This recipe uses native macOS OpenSSH, a dedicated agent and Keychain. It does not replace transport authentication or GCM. Other operating systems need an explicitly chosen native secure-store/agent procedure; do not install this LaunchAgent there. Non-exportable hardware keys cannot be converted into this file-based setup without changing identity: stop rather than replacing them.
+Discover the installed Git/OpenSSH versions, approved key fingerprint, intended agent/socket and available secure store before changing anything. Reuse the intended working signer; keep the same fingerprint, verify a throwaway Git signature and verify the target profile's effective settings and isolation. This is independent of Git transport credentials and GCM. If a forwarded socket is the intended signer, keep the key on its owning machine and follow [native bridge setup](../../toolchain/references/bridges.md) only when forwarding is approved.
+
+If password-manager independence was requested and no suitable native setup exists, determine whether the same key can be used on this host. Use the installed platform's documented agent and secure-store or interactive unlock procedure. With native OpenSSH, use a dedicated private socket, load the approved key in the owner's terminal, and scope `SSH_AUTH_SOCK` only to signing. If a compatible secure unlock/service is unavailable, disclose that limit rather than storing a plaintext passphrase, claiming unattended reload or substituting a different key. Non-exportable hardware keys are not candidates for a file import.
+
+## Optional macOS implementation
+
+Use the following recipe only on macOS when native OpenSSH, Keychain and a user LaunchAgent fit the approved scope. Do not apply these commands on another platform. Use the same fingerprint, staged activation and isolated proof with that platform's native tools.
 
 ## Preserve identity and import privately
 

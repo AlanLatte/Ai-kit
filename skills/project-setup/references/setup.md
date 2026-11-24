@@ -20,14 +20,7 @@ Back up only affected local configuration privately. Preserve unrelated include 
 
 ## 2. Install missing prerequisites explicitly
 
-Reuse `toolchain` for diagnostics, but do not install its entire inventory for this task. With installation approval, install only missing prerequisites using the OS's supported package manager. On macOS with Homebrew:
-
-```sh
-brew install git ghq
-brew install --cask git-credential-manager
-```
-
-Skip already installed tools; do not install Homebrew silently. GCM installers can configure Git globally: inspect their effects and obtain explicit approval before installation if an existing helper chain could be reset. A request for one workspace does not authorize a machine-wide credential migration. For other OSes follow the official installation links below. Git for Windows may already include GCM; Linux requires an explicitly selected secure credential store. The signing recipe below is macOS-specific, not a claim of Windows/Linux support.
+Reuse `toolchain` for diagnostics, but do not install its entire inventory for this task. With installation approval, use the [host-native procedure](../../toolchain/references/native-installation.md) for missing Git, ghq and GCM prerequisites. Check bundled tools first and use the official ghq/GCM instructions below for the detected host. GCM installers can change global Git helpers; inspect their effects and obtain explicit approval if an existing helper chain could be reset. One workspace does not authorize a machine-wide credential migration.
 
 ## 3. Keep workspace configuration local
 
@@ -85,7 +78,7 @@ Reuse working GCM configuration without running `configure`. That command change
     helper = manager
 ```
 
-Verify `git credential-manager --version` resolves the installed executable, then re-read effective helpers for the intended URL and a nonmatching host/workspace. Do not hardcode another machine's executable path, globally clear helpers, enable plaintext storage or bypass TLS. On macOS use the existing Keychain store.
+Verify `git credential-manager --version` resolves the installed executable, then re-read effective helpers for the intended URL and a nonmatching host/workspace. Reuse the existing supported secure credential store or select one from GCM's documentation for the detected host/session. Do not hardcode another machine's path, globally clear helpers, enable plaintext storage or bypass TLS.
 
 Keep host-specific provider/account settings in the appropriate local profile. For multiple accounts on one host, explicitly select the intended username/provider according to that provider's documentation; an author email is not an authentication selector. For GitHub, inspect `git credential-manager github list` and, if needed, use `git credential-manager github login --username <account> --browser`. The user completes authentication privately. Verify the intended account in the authentication flow; never infer it solely from access to a public repository.
 
@@ -95,11 +88,11 @@ Never run `git credential fill` into chat, enable `credential.traceSecrets`, or 
 
 ## 6. Set up independent signing and accept the result
 
-For existing SSH signing keys on macOS, read [ssh-signing.md](ssh-signing.md) before importing or changing anything. Do not generate a replacement key, duplicate a private key into `.config`, change fingerprint or disable signing because the password manager is unavailable.
+For SSH signing, follow [native signing discovery and proof](ssh-signing.md) before importing or changing anything. Reuse an authorized existing signing agent, hardware key or forwarded socket when it is the intended signer. A new independent signing store, certificate enrollment and forwarding changes are separate trust decisions; use the project's existing access procedure and the [native bridge reference](../../toolchain/references/bridges.md#ssh-agent-local-keys-scoped-forwarded-socket) when forwarding is approved. Do not generate a replacement key, duplicate a private key into `.config`, change fingerprint or disable signing.
 
 Verify the actual checkout's root, remote, author name/email, signing public key and `gpg.ssh.program` with configuration origins. Check a neighboring workspace for identity isolation. Verify ghq's resolved location rather than only the configuration text. With remote-access authorization, a read-only remote check proves access, not account identity or write permission.
 
-Signing acceptance requires the same fingerprint and a successful cryptographically verified signature with the password-manager socket unavailable, including reloading into a fresh dedicated agent. Use a throwaway signed Git commit outside application repositories if testing the Git integration. Never restart or empty a shared agent containing another session's keys. Report what was installed or changed, actual checks, Keychain interaction or missing prerequisites, and how to restore the affected local files. Leave an incomplete signing change inactive.
+Signing acceptance requires the same fingerprint and a cryptographically verified signature using the intended signer. If independence from a password-manager socket was requested, verify with that socket unavailable and a fresh dedicated test agent. Test Git integration in a disposable repository, not an application checkout. Never restart or empty a shared agent. Report actual checks and remaining owner actions; leave an incomplete change inactive.
 
 ## 7. Configure the project environment
 
@@ -130,6 +123,21 @@ procedure. `.venv/bin` and policy wrappers must win over baseline tools. Keep
 environment values, broadly trust parent directories, install on entry or
 silently re-allow modified clones. Normal use after setup is `cd` then `omp`;
 explicit `mise exec` remains the documented automation fallback.
+
+## 8. Register with tmux only when selected
+
+For a workspace being explicitly created or connected, carry forward its local
+tmux opt-in if one is already recorded. Otherwise offer an unchecked option
+alongside the project setup choices if tmux is configured; no extra prompt if
+the user already decided. An unavailable or disabled tmux never blocks project
+setup. Machine bootstrap, tools-only setup, ordinary startup and settings
+reports do not register projects.
+
+After the canonical root is ready, the agent runs the [native project
+registration procedure](../../toolchain/references/tmux.md#workspace-register-one-approved-root).
+Keep the real root, name and registration link in the owning local setup or
+existing launcher inventory, never in Ai-Kit. Registration is independent of
+Git credentials, certificates, signing agents and SSH forwards.
 
 ## Authoritative references
 

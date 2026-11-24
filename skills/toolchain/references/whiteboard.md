@@ -4,20 +4,9 @@ Choose the mode yourself: reuse an installed official CLI/app and its intended s
 
 ## Desktop: install and operate without manual PATH setup
 
-On macOS with approved Homebrew dependencies:
+Use the [official platform download](https://dev.fast/install) or a supported package selected through [native installation](native-installation.md). Determine the actual installed version and location. Do not purge an existing app or its state.
 
-```sh
-brew install --cask devdotfast/tap/whiteboard
-```
-
-The official alternative is the correct platform download from [dev.fast/install](https://dev.fast/install). Reuse the actual bundle location; do not assume every user installed into `/Applications`. Determine the installed version after installation because a package-manager cask may lag the app's release. Never use `--zap` or delete existing application state.
-
-If `whiteboard` is already on PATH and is the intended official CLI, use it. Otherwise locate the installed Desktop's executable and bundled `review-runtime/dist/cli.js`. This is the official shim's bootstrap mechanism and needs no system Node. Validate both paths; do not import internal functions or guess hashed JavaScript filenames. A parameterized macOS invocation is:
-
-```sh
-ELECTRON_RUN_AS_NODE=1 "$app/Contents/MacOS/Whiteboard" \
-  "$app/Contents/Resources/app/review-runtime/dist/cli.js" version --json
-```
+If the official `whiteboard` CLI is already on PATH, reuse it. Otherwise inspect the installed platform's official shim implementation to locate the Desktop executable and bundled CLI. When that mechanism is supported, run the discovered executable with `ELECTRON_RUN_AS_NODE=1` and the actual bundled CLI path followed by `version --json`. Validate both paths; do not assume a bundle layout, import internal functions or guess hashed filenames.
 
 Use those discovered executable/script paths for every following CLI command and, if selected, the local MCP definition. Keep `ELECTRON_RUN_AS_NODE=1` confined to that child or MCP server env. Do not copy another machine's personalized shim. There is no verified non-UI command to install Desktop's managed PATH shim; do not invoke private UI endpoints or mistake the app's `bin/code` for its review CLI. Direct bundled invocation provides automatic agent setup without requiring the user to click a PATH installer.
 
@@ -31,7 +20,7 @@ The verified standalone package is `@dev.fast/whiteboard`; version0.5.2 requires
 npm install --global @dev.fast/whiteboard
 ```
 
-Do not replace a Desktop-managed shim or another default Node to make this command pass. If the existing Node is incompatible, disclose that dependency conflict. Install/reuse a separate compatible Node runtime only with approval (on macOS `brew install node@24` is an available route). Use its absolute Node/npm paths and a dedicated private installation prefix rather than silently changing the machine-wide Node/PATH. Resolve the installed package's `bin.whiteboard` entry from its package metadata; invoke it through that Node executable. Record the resolved invocation privately and use it consistently for server startup, status and MCP. Do not claim the ordinary PATH command is ready when only a managed invocation is configured.
+Do not replace a Desktop-managed shim or another default Node to make this command pass. If the existing Node is incompatible, disclose that dependency conflict. Install or reuse a separate compatible runtime only with approval, using [native installation](native-installation.md). Use its absolute Node/npm paths and a dedicated private prefix rather than silently changing the machine-wide Node/PATH. Resolve the installed package's `bin.whiteboard` entry from its package metadata and invoke it through that Node executable. Use the resolved invocation for server startup, status and MCP; do not claim the ordinary PATH command is ready if only the managed invocation works.
 
 When installing into a private prefix, run npm with the chosen runtime in that child process, for example `env PATH="$node_bin:$PATH" "$node_bin/npm" install --prefix "$tool_prefix" @dev.fast/whiteboard`. An absolute npm path alone does not override its env-node shebang. Invoke the resolved entry with `"$node_bin/node" "$cli_entry" ...`. Save only the non-secret resolved command/args/runtime/state-directory metadata under `${XDG_CONFIG_HOME:-$HOME/.config}/ai-kit/tools.json`, merging the selected component without replacing others, so future inventory can reuse it even when it is not on PATH. Never put credentials there.
 

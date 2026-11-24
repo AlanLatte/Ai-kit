@@ -4,14 +4,7 @@ Separate the CLI, tracker initialization and MCP integration internally, not as 
 
 ## Install only when absent
 
-On macOS with an approved Homebrew dependency:
-
-```sh
-brew install backlog-md
-backlog --version
-```
-
-The official npm alternative is `npm install --global backlog.md`, with an approved compatible Node/npm runtime. The package is `backlog.md`, the executable is `backlog`. Do not install another Bun or a second distribution merely because the existing executable came from Homebrew. Preserve existing trackers and use their local CLI policy.
+Reuse a working `backlog`. Otherwise use the [official installation methods](#sources) for the detected host, following [native installation](native-installation.md). Where a compatible npm runtime is approved, the package is `backlog.md`; the executable is `backlog`. Verify `backlog --version`. Do not install another runtime or distribution merely to replace a working one. Preserve existing trackers and their local policy.
 
 ## Resolve or explicitly create a tracker
 

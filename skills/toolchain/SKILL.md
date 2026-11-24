@@ -15,6 +15,9 @@ Choose only the requested operation; loading this skill authorizes no mutation. 
 | Model discovery, roles or planner/executor/reviewer setup | [Native model setup and handoff](references/models.md), also required for approved OMP setup |
 | Browser/callback, SSH-agent or clipboard bridge | [Native bridges](references/bridges.md); discover direction and trust before approval |
 | Hindsight or bank routing | Machine procedure section 4 and [memory charter](../../docs/memory.md); preserve banks/auth/backend, no migration |
+| Optional tmux installation or session registration | [Native tmux](references/tmux.md); opt-in only, no project discovery at startup |
 | One integration | Read only its reference: [Backlog](references/backlog.md), [Whiteboard](references/whiteboard.md), [direnv](references/direnv.md), [LSP](references/lsp.md) |
 
 For workspace requests Ai-Kit owns shared mise/bootstrap and direnv activation, the project kit owns inventory/compatibility, and the workspace owns native pins/locks/`.envrc`; repositories retain their runners and environments. Reuse the [existing workspace layout](../project-setup/references/workspace-layout.md), not another directory layer. Preserve unselected tools, identities, profiles, services and settings. Private auth, conflicting configuration and OS permissions require the owner; continue independent approved components. A binary or handshake alone is not readiness.
+
+Shared manifests and skills describe capabilities and procedures, not consumer project names, links or policies. Discover the actual host and use its supported native installation route; do not assume a package manager, OS, credential store or service manager.

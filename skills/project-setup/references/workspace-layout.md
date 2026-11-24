@@ -28,8 +28,9 @@ root. Reuse the caller's canonical root and existing owner.
 - `.config/libexec`: supporting script payloads that are not public commands.
 - `.config/git/config`: canonical workspace Git profile, selected by scoped Git
   includes; command-specific signing configuration can live beside it.
-- `.config/systemd`: source/templates for workspace-owned units, when present.
-  Do not confuse a template with an installed or enabled user/system service.
+- `.config/systemd`: optional workspace-owned unit templates when the target
+  uses systemd. Do not create this directory on other hosts by default or
+  confuse any service template with an installed or enabled service.
 
 Create only needed directories during approved setup. Keep configuration
 secret-free and user-owned, with private backups and restrictive permissions

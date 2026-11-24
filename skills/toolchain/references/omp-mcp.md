@@ -7,13 +7,7 @@ help/schema before setup; older historical smoke results do not prove these
 APIs. Report unsupported capabilities rather than silently omitting them or
 upgrading the user's client without approval.
 
-Reuse an existing working `omp`. Compiled OMP does not need external Bun. On macOS the official Homebrew route is:
-
-```sh
-brew install can1357/tap/omp
-```
-
-The official macOS/Linux binary alternative is `curl -fsSL https://omp.sh/install | sh -s -- --binary`; when pinning, retain `--binary` and use an approved `--ref`. Choose one route, not both. Review the official installer before execution; it verifies downloaded binary SHA-256 and checks `--version`, but does not fix a conflicting earlier PATH entry. Do not install Bun merely because it is absent. On Windows use the current official supported installation instructions rather than macOS commands.
+Reuse a working `omp`. For an approved install, follow [OMP's official instructions](https://github.com/can1357/oh-my-pi#installation) via the [host-native procedure](native-installation.md). Select one supported distribution for the detected host. Compiled OMP does not require an external Bun. When using the upstream installer, inspect it first and use its documented binary and version-selection options. Verify the effective `omp --version`; an earlier PATH entry can shadow the new executable.
 
 Resolve the effective current profile and workspace before any write; do not ask the user to choose a profile in normal recommended setup. Use a different profile only when explicitly requested or to resolve a real conflict. Inspect `omp config path`, or `omp --profile <name> config path` for an explicitly selected profile, and relevant `config get <key> --json` and project settings. `config path` returns the agent directory, not a configuration file. Environment overrides such as `PI_CONFIG_DIR`, `PI_CODING_AGENT_DIR` and `OMP_PROFILE` affect discovery. Verify their effective result; never clear them or move the default profile silently.
 

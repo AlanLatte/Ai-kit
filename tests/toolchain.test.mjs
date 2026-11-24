@@ -5,7 +5,7 @@ import { tmpdir } from "node:os";
 import { join } from "node:path";
 import test from "node:test";
 
-function fixture(t, { ready = false, missing = [], installReady = false, installStatus = "0", brewStatus = "0" } = {}) {
+function fixture(t, { ready = false, missing = [] } = {}) {
   const directory = mkdtempSync(join(tmpdir(), "ai-kit toolchain "));
   t.after(() => rmSync(directory, { recursive: true, force: true }));
   const scripts = join(directory, "kit with spaces", "scripts");
@@ -20,20 +20,12 @@ function fixture(t, { ready = false, missing = [], installReady = false, install
   writeFileSync(calls, "");
   if (ready) writeFileSync(state, "ready");
   symlinkSync("/usr/bin/dirname", join(bin, "dirname"));
-  for (const name of ["git", "python3", "uv", "direnv", "docker", "pre-commit", "ripwire", "tuicr", "jq", "shellcheck", "tre"]) {
+  for (const name of ["git", "python3", "uv", "direnv", "docker", "pre-commit", "ripwire", "tuicr", "jq", "shellcheck", "tre", "tmux"]) {
     if (!missing.includes(name)) writeFileSync(join(bin, name), "#!/bin/bash\nexit 0\n", { mode: 0o755 });
   }
-  writeFileSync(join(bin, "brew"), '#!/bin/bash\nprintf "brew %s\\n" "$*" >> "$CALLS"\nexit "$BREW_STATUS"\n', { mode: 0o755 });
   writeFileSync(join(bin, "node"), `#!/bin/bash
 printf 'hindsight %s\\n' "$2" >> "$CALLS"
-case "$2" in
-  check) [ -f "$STATE" ] ;;
-  install)
-    if [ "$INSTALL_READY" = 1 ]; then printf ready > "$STATE"; fi
-    exit "$INSTALL_STATUS"
-    ;;
-  *) exit 2 ;;
-esac
+[ "$2" = check ] && [ -f "$STATE" ]
 `, { mode: 0o755 });
   return {
     state,
@@ -41,36 +33,35 @@ esac
     run: (...args) => spawnSync("/bin/bash", [script, ...args], {
       cwd: directory,
       encoding: "utf8",
-      env: { PATH: bin, HOME: directory, AI_KIT_CLIENT: "omp", CALLS: calls, STATE: state, INSTALL_READY: installReady ? "1" : "0", INSTALL_STATUS: installStatus, BREW_STATUS: brewStatus },
+      env: { PATH: bin, HOME: directory, AI_KIT_CLIENT: "omp", CALLS: calls, STATE: state },
     }),
   };
 }
 
 test("diagnostics never install binaries or create service state", (t) => {
   const context = fixture(t);
-  assert.equal(context.run("check").status, 0);
+  assert.equal(context.run("check").status, 1);
   assert.equal(context.run("report").status, 0);
-  assert.ok(context.calls().every((call) => call === "hindsight check"));
+  assert.deepEqual(context.calls(), ["hindsight check", "hindsight check"]);
   assert.equal(existsSync(context.state), false);
 });
 
-test("empty, unknown and mixed-invalid selections reject before any installer or service probe", (t) => {
-  for (const selection of [[], ["unknown"], ["jq", "unknown"], ["jq; false"]]) {
-    const context = fixture(t, { missing: ["jq"] });
-    assert.equal(context.run("install", ...selection).status, 2);
-    assert.deepEqual(context.calls(), []);
-    assert.equal(existsSync(context.state), false);
-  }
+test("diagnostics reject installer mode and unknown component IDs before probing services", (t) => {
+  const context = fixture(t, { missing: ["jq"] });
+  assert.equal(context.run("install", "hindsight", "jq").status, 2);
+  assert.equal(context.run("check", "hindsight", "unknown").status, 2);
+  assert.deepEqual(context.calls(), []);
 });
 
-test("a binary-only selection does not inspect or configure Hindsight", (t) => {
-  for (const name of ["jq", "tuicr", "direnv"]) {
-    const context = fixture(t, { missing: [name], installReady: true });
-    const result = context.run("install", name);
-    assert.equal(result.status, 1);
-    assert.deepEqual(context.calls(), [`brew install ${name}`]);
-    assert.equal(existsSync(context.state), false);
-  }
+test("a selected missing binary fails check but remains reportable", (t) => {
+  const context = fixture(t, { missing: ["jq"] });
+  const check = context.run("check", "jq");
+  assert.equal(check.status, 1);
+  assert.match(check.stderr, /jq\s+JSON inspection/);
+  const report = context.run("report", "jq");
+  assert.equal(report.status, 0);
+  assert.match(report.stdout, /jq\s+JSON inspection/);
+  assert.deepEqual(context.calls(), []);
 });
 
 test("selected report does not inspect unselected service configuration", (t) => {
@@ -79,36 +70,15 @@ test("selected report does not inspect unselected service configuration", (t) =>
   assert.deepEqual(context.calls(), []);
 });
 
-test("unselected missing tools do not fail a successful selected service setup", (t) => {
-  const context = fixture(t, { missing: ["jq"], installReady: true });
-  assert.equal(context.run("install", "hindsight").status, 0);
-  assert.equal(existsSync(context.state), true);
-  assert.ok(context.calls().every((call) => call.startsWith("hindsight ")));
+test("missing tmux fails only an explicit tmux readiness check", (t) => {
+  const context = fixture(t, { ready: true, missing: ["tmux"] });
+  assert.equal(context.run("check").status, 0);
+  assert.equal(context.run("check", "tmux").status, 1);
+  assert.match(context.run("report", "tmux").stdout, /tmux\s+optional terminal multiplexer/);
 });
 
-test("healthy selected installations are reused without another install", (t) => {
-  const context = fixture(t, { ready: true });
-  assert.equal(context.run("install", "hindsight", "jq", "tuicr", "direnv").status, 0);
-  assert.ok(context.calls().every((call) => call === "hindsight check"));
-  assert.equal(existsSync(context.state), true);
-});
-
-test("installer success cannot hide selected service unavailability", (t) => {
+test("an available tmux satisfies an explicit check without probing Hindsight", (t) => {
   const context = fixture(t);
-  assert.equal(context.run("install", "hindsight").status, 1);
-  assert.equal(existsSync(context.state), false);
-});
-
-test("installer failure remains nonzero even if selected service becomes ready", (t) => {
-  const context = fixture(t, { installReady: true, installStatus: "7" });
-  assert.equal(context.run("install", "hindsight").status, 1);
-  assert.equal(existsSync(context.state), true);
-});
-
-test("independent selected components continue after another installation fails", (t) => {
-  const context = fixture(t, { missing: ["jq"], installReady: true, brewStatus: "3" });
-  assert.equal(context.run("install", "jq", "hindsight", "hindsight").status, 1);
-  assert.equal(existsSync(context.state), true);
-  assert.equal(context.calls().filter((call) => call === "hindsight install").length, 1);
-  assert.equal(context.calls().filter((call) => call === "brew install jq").length, 1);
+  assert.equal(context.run("check", "tmux").status, 0);
+  assert.deepEqual(context.calls(), []);
 });

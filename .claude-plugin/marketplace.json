@@ -8,7 +8,7 @@
       "name": "ai-kit",
       "source": "./",
       "version": "0.5.5",
-      "description": "Personal OMP tooling, Ponytail and optional Hindsight",
+      "description": "Shared agent skills and host-native environment setup",
       "skills": [
         "./skills",
         "./vendor/ponytail/skills/ponytail",

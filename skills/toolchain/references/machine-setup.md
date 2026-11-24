@@ -19,7 +19,7 @@ locks/runners and may refine versions. A user-local cache does not imply global
 tool selection. Do not remove an existing mise-dependent `.envrc` because other
 dependency managers happen to be present.
 
-The remaining sections are the original machine-wide environment setup flow. Do not infer machine-wide approval from a workspace request.
+Do not infer machine-wide approval from a workspace request.
 
 This is an agent-run setup flow, not an instruction sheet. Ask where projects belong, then offer "Реши все за меня" as the default with a free-form language field prefilled `go, python`. Execute the approved setup yourself, including dependencies and integrations. Reading the skill or displaying defaults is not installation approval. Do not resume a previously cancelled setup merely because the user requests changes to Ai-Kit itself.
 
@@ -52,13 +52,14 @@ Show one editable path, prefilled with the detected development root. If several
 Show only these two choices:
 
 - **Реши все за меня (рекомендуется)**, selected by default. Disclose missing recommended tools and official dependencies, integrations, direnv shell hook, selected LSP servers, native OMP UI, five-minute ask auto-submit, plugin update notifications and model-role setup, and necessary local services. Preserve settings/data/keys and the user's ordinary-chat default; conflicting role/bar assignments need resolution. Discover requested bridge directions, but forwarding, browser tabs, clipboard access and private authentication require their explicit trust/authorization decision. Project `.envrc` is created only during explicit project setup, not across every checkout.
-- **Хочу выбрать сам**. Show one component list with every item selected by default; the user removes unwanted items. Do not follow it with another MCP, profile, service-mode or dependency questionnaire. Include the same free-form language input in that component form when the mode form did not already collect it.
+- **Хочу выбрать сам**. Show one component list with recommended items checked and tmux unchecked. Do not follow it with another MCP, profile, service-mode or dependency questionnaire. Include the same free-form language input in that component form when the mode form did not already collect it.
 
 The native mode form can use this shape:
 
 ```html
 <form>
 <p>Агент установит недостающее, подключит интеграции, direnv и выбранные LSP, настроит native OMP UI, автоотправку ask через пять минут, уведомления об обновлениях plugins и модельные роли и запустит необходимые локальные сервисы. Данные, ключи и обычная default-модель сохраняются; конфликты настроек согласуются. Для bridges сначала определяются направления и доверие; forwarding, tabs, clipboard и приватная аутентификация требуют отдельного разрешения. .envrc создается только при настройке выбранного проекта.</p>
+<p>tmux не входит в рекомендуемый набор. Его можно включить при ручном выборе или запросить отдельно.</p>
 <fieldset>
 <legend>Как настроить окружение?</legend>
 <label><input type="radio" name="setup_mode" value="recommended" checked> Реши все за меня: OMP/роли, память, Backlog, Whiteboard, Git/ghq/GCM, подписи, direnv, LSP, discovery bridges и общие инструменты</label>
@@ -68,22 +69,23 @@ The native mode form can use this shape:
 </form>
 ```
 
-In custom mode generate one native multi-select from the following table, with all entries checked/selected. Empty custom selection means no mutation, not fallback to the recommended set. If forms are unavailable, ask the same questions in text and wait for answers; do not simulate consent.
+In custom mode generate one native multi-select from the following table. Only tmux starts unchecked. Empty custom selection means no mutation, not fallback to the recommended set. If forms are unavailable, ask the same questions in text and wait for answers; do not simulate consent.
 
 | ID | Component and included setup |
 |---|---|
 | omp | OMP in the current profile: [native UI/MCP](omp-mcp.md) and [model roles and bounded handoff](models.md) |
-| hindsight | Native Hindsight memory; existing helper and section4 below |
+| hindsight | Native Hindsight memory; existing helper and section 4 below |
 | backlog | Backlog.md and its MCP connector; reuse an existing owning tracker, [Backlog setup](backlog.md) |
 | whiteboard | Whiteboard and its MCP connector; [Whiteboard setup](whiteboard.md) |
 | git-workspace | Git, ghq, GCM and existing-key signing; reuse `skill://project-setup` |
-| tuicr | Terminal code review; `brew install tuicr` on macOS, [official installation methods](https://github.com/agavra/tuicr#install) elsewhere; verify `tuicr --version` |
+| tuicr | Terminal code review; [official installation methods](https://github.com/agavra/tuicr#install); verify `tuicr --version` |
 | direnv | Per-project environments and an active shell hook; [direnv setup](direnv.md) |
 | lsp | Install and configure native language servers for the free-form language answer; [LSP setup](lsp.md) |
 | bridges | Discover requested local/remote browser, callback, SSH-agent and clipboard directions, then apply only explicitly approved [native bridges](bridges.md); never infer trust or remote access |
 | python3, uv, docker, pre-commit, node, ripwire, jq, shellcheck, tre | One entry per common tool |
+| tmux | Optional, unchecked: [native installation and per-user configuration](tmux.md); register workspaces only through explicit project setup |
 
-Recommended mode selects every entry in this table. Git is included through `git-workspace`, not a duplicate checkbox. MCP is included with Backlog and Whiteboard, not a separate choice; Hindsight uses OMP's native backend. Additional MCP servers are configured only when explicitly requested. LSP is native, not MCP: install the servers for the user's language answer yourself. Normalize language aliases and duplicates as data, never shell input. Use `go, python` only when the field was not supplied; an explicitly empty field selects no languages. If `lsp` is deselected, ignore the language field and install no language-specific dependencies.
+Recommended mode selects every entry except tmux. Git is included through `git-workspace`, not a duplicate checkbox. MCP is included with Backlog and Whiteboard, not a separate choice; Hindsight uses OMP's native backend. Additional MCP servers are configured only when explicitly requested. LSP is native, not MCP: install the servers for the user's language answer yourself. Normalize language aliases and duplicates as data, never shell input. Use `go, python` only when the field was not supplied; an explicitly empty field selects no languages. If `lsp` is deselected, ignore the language field and install no language-specific dependencies.
 
 Choose technical details yourself: retain the effective current OMP profile and its environment overrides; reuse healthy services and matching Git profiles; prefer an installed Whiteboard mode, otherwise Desktop on a supported graphical machine and headless on a server; use stdio for bundled MCP connectors and preserve appropriate existing client scopes. Keep generic user connectors generic and tracker-specific bindings project-local. Do not ask about these defaults merely because configuration has several possible shapes.
 
@@ -93,16 +95,13 @@ Ask only when execution genuinely needs private authentication, a missing author
 
 ## 3. Execute only the approved plan
 
-Use the package manager and OS supported by the chosen component's official installer. Reuse working installations; do not upgrade everything or replace a different active runtime. The helper's installation recipes are macOS recipes; on other OSes use the selected tool's official native installer, not macOS commands.
-
-For common tools, pass every approved ID explicitly. The helper rejects empty and unknown selections before acting:
+Follow [native installation](native-installation.md) for each approved missing component. The agent chooses the supported method for the detected host and executes it; `toolchain.sh` only checks/reports. Pass explicit component IDs when checking a selection:
 
 ```sh
-bash ../../../scripts/toolchain.sh install jq shellcheck
 bash ../../../scripts/toolchain.sh report jq shellcheck
 ```
 
-Do not pass advanced IDs such as `omp`, `whiteboard`, `lsp` or `mcp` to this helper; execute their linked native procedures. The `direnv` helper entry installs/checks the binary only; complete and verify its shell hook through the linked procedure. Deduplicate dependencies and order them before consumers. For local Hindsight, install approved missing binaries first, start Docker only if its startup was disclosed and approved, then run the Hindsight helper. Never use bare `install`, add unrelated tools to fix an exit status, run `eval` on user-supplied commands, or turn an absent app into a global failure for unselected components.
+Run linked integration procedures separately. The direnv diagnostic checks the binary only; verify its shell hook as well. Deduplicate dependencies and order them before consumers. For local Hindsight, install approved missing binaries first, start Docker only if disclosed and approved, then run the Hindsight helper. Never run `eval` on user-supplied commands or fail setup because an unselected component is absent.
 
 Do the configuration as well as binary installation: resolve the selected profile, preserve unrelated settings, write or merge only approved fields and verify effective values. Back up affected existing files privately. An existing server with a matching name is not permission to replace its complete definition or auth. Use argument arrays for custom executable/args and keep secrets in native credential storage or local environment references, never arguments or public files.
 
